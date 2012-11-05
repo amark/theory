@@ -805,17 +805,16 @@ var theory = (function(b,c,fn){
 				});
 				_require.cache = _require.cache||{};
 				if(!p){
-					//console.log('require()ing');
 					return _require;
-				}
-				if(_require.cache[p] || window[p]){
-					console.log(p+' already cached');
-					return _require.cache[p];
 				}
 				if(util.stripify(p) == util.stripify(root.name)){
 					return (function(cb,deps){
 						return util.async(deps,cb);
 					});
+				}
+				if(_require.cache[p] || window[p]){
+					console.log(p+' already cached');
+					return _require.cache[p];
 				}
 				window.module.ajax.code(p,function(d){
 				});
