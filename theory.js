@@ -751,6 +751,7 @@ var theory = (function(b,c,fn){
 		(function(){
 			global.node = true;
 			global.theory = theory;
+			process.env.totheory = __filename;
 			global.name = root.name;
 			if(process.env.NODE_ENV==='production'){process.env.LIVE = true};
 			module.rel = (module.parent||{filename:''}).filename.split('/').slice(0,-1).join('/');
