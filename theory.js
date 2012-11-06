@@ -384,13 +384,8 @@ var theory = (function(b,c,fn){
 			regex.ext = /\.([^\.]+)$/i;
 			regex.ws_ = /\-/ig;
 			regex.space = /\s/ig;
-			regex.num = {
-				'int': /(\-\d+|\d+)/g
-			}
-			regex.__ = {
-				fn: /\-\>$/
-				,dot: /\./
-			}
+			regex.num = { 'int': /(\-\d+|\d+)/g };
+			regex.__ = { fn: /\-\>$/, dot: /\./ };
 			return regex;
 		})(text);
 		text.caps = (function(t){
@@ -543,9 +538,9 @@ var theory = (function(b,c,fn){
 				};
 				theory.com.wire.onmessage = function(m){
 					m = a.obj.ify(m.data||m);
-					if(a(theory.com.asked,'ask'+m.when)){
-						a(theory.com.asked,'ask'+m.when+"->")(m);
-						delete theory.com.asked[('ask'+m.when)];
+					if(theory.com.asked[m.when]){
+						a(theory.com.asked,m.when+"->")(m);
+						delete theory.com.asked[m.when];
 						return;
 					}
 					com.msg(m);
@@ -601,7 +596,7 @@ var theory = (function(b,c,fn){
 			}
 			m = com.meta(m,w);
 			delete m.where;
-			theory.com.asked['ask'+m.when] = f;
+			theory.com.asked[m.when] = f;
 			com.write(m);
 		});theory.com.asked = theory.com.asked||{};
 		com.reply = (function(m){
