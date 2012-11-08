@@ -459,6 +459,10 @@ var theory = (function(b,c,fn){
 		time.now = (function(){
 			return a.num.i((a.time.is().toString())+a.num.r(4))
 		});
+		time.loop = (function(fn,d){
+			var args = a.fns.sort(a.list.slit.call(arguments, 0));
+			return (args.f.length)?setInterval(a.list(args.f).at(1),a.list(args.n).at(1)):null;
+		});
 		time.wait = (function(fn,d){
 			var args = a.fns.sort(a.list.slit.call(arguments, 0));
 			return (args.f.length)?setTimeout(a.list(args.f).at(1),a.list(args.n).at(1)):null;
@@ -510,20 +514,7 @@ var theory = (function(b,c,fn){
 				process.send({onOpen:{readyState:(process.readyState = 1),state:(a.obj.get(a,opt.way+'.state')?a[opt.way].state():false)}});
 				com.wire = process;
 				return;
-			}else{
-				return;
 			}
-			com.zmq = require('zmq-3.0');
-			opt = com.opt(opt);
-			if(!opt.port) return;
-			com.src = (opt.wire +'://'+ opt.host)
-				+ ((opt.port)?':'+opt.port:'');
-			com.wire = com.zmq.createSocket(opt.type);
-			com.wire.connect(com.src);
-			com.wire.on('message', function(msg){
-				msg = msg.toString();
-				com.msg(msg);
-			});
 		});
 		com.page = (function(){
 			com.src = com.src||(window.location.protocol +'//'+ window.location.hostname)
@@ -578,7 +569,6 @@ var theory = (function(b,c,fn){
 			return m;
 		});
 		com.msg = (function(m,c){
-			//console.log("got --> "+a.text.ify(m));
 			theory.obj.get(theory,theory(m,'how.way')+'->')(m,c);
 		});
 		com.ways = (function(m,w){
@@ -762,7 +752,7 @@ var theory = (function(b,c,fn){
 					if(r){
 						theory[(j=util.stripify(j))] = m.theory[j] = r;
 					}
-				});
+				},m);
 				console.log(m.name+'!');
 				var mod = (theory[m.name] = global.a[m.name] = cb(m.theory));
 				if(global.aname === m.name && theory.com) theory.com(root.name).init(m.name);
@@ -840,6 +830,12 @@ var theory = (function(b,c,fn){
 				var ao = a.list(args.o).at(1);
 				if(ao.name) return ao;
 			}
+			if(args.f.length){
+				return {
+					name: a.list(args.t).at(1)
+					,init: a.list(args.f).at(1)
+				}
+			}
 		});
 		_this.launch = (function(m,i){
 			root.launch[m.name] = true;
@@ -897,22 +893,23 @@ var theory = (function(b,c,fn){
 				console.log("Network error.");
 			};
 		});
-		_this.deps = (function(args,fn){
+		_this.deps = (function(args,fn,mod){
 			var deps = {};
 			if(args.t.length){
-			
 			}
 			if(args.l.length){
-				var ao = a.list(args.l).at(1);
+				var ao = mod||a.list(args.l).at(1);
 				deps = ao.dependencies||ao.require||ao.dep;
 			}
 			if(args.o.length){
-				var ao = a.list(args.o).at(1);
+				var ao = mod||a.list(args.o).at(1);
 				deps = ao.dependencies||ao.require||ao.dep;
 			}
-			ao.dependencies = deps;
+			(ao||mod).dependencies = deps;
 			a.list(deps).each(function(v,i){
-				if(a.num.is(v) || a.text.is(v)){
+				if(a.list.is(deps)){
+					i = v;
+				} else {
 					v = {v:v};
 				}
 				fn(i,v);
@@ -945,7 +942,7 @@ var theory = (function(b,c,fn){
 				}else{
 					m.theory[i] = theory[i];
 				}
-			});
+			},m);
 			if(b){
 				cb = util.launch(m);
 				theory[m.name] = cb(m.theory||theory);
@@ -976,7 +973,7 @@ var theory = (function(b,c,fn){
 				b = true;
 				if(l && v.theory) v.theory[p] = theory[p];
 				a.list(v.dependencies).each(function(w,j){
-					if(!root.launch[(j=util.stripify(j))]){
+					if(!root.launch[(j=util.stripify(a.list.is(v.dependencies)?w:j))]){
 						return b = false;
 					}
 					v.theory[j] = theory[j];
