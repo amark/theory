@@ -372,6 +372,12 @@ var theory = (function(b,c,fn){
 			}
 			return s;
 		});
+		text.clip = (function(t,r,s,e){
+			if($=a.fns.$(this)){
+				e=s;s=r;r=t;t=$;
+			}
+			return (t||'').split(r).slice(s,e).join(r);
+		});
 		text.find = (function(_this){
 			var regex = {};
 			a.log(regex.name = _this.name+'.find');
@@ -739,7 +745,7 @@ var theory = (function(b,c,fn){
 			process.env.totheory = __filename;
 			global.name = root.name;
 			if(process.env.NODE_ENV==='production'){process.env.LIVE = true};
-			module.rel = (module.parent||{filename:''}).filename.split('/').slice(0,-1).join('/');
+			module.rel = require('path').dirname((module.parent||{}).filename);
 			module.exports=(function(cb,deps,name){
 				var args = a.fns.sort(a.list.slit.call(arguments, 0)), r
 					,m = util.mod(args);
