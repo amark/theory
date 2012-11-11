@@ -486,38 +486,12 @@ var theory = (function(b,c,fn){
 		com.queue = [];
 		theory.com.queue = theory.com.queue||[];
 		com.dc = [theory.time.now()];
-		com.opt = (function(opt,type){
-			opt = opt||{};
-			opt.type = opt.type||type||'xreq';
-			opt.wire = opt.wire||'tcp';
-			opt.host = ((opt.host||'localhost') === 'localhost')?
-				'127.0.0.1' : opt.host;
-			return opt;
-		});
-		com.create = (function(opt){
-			opt = com.opt(opt,'xrep');
-			if(!opt.port) return;
-			com.src = (opt.wire +'://'+ opt.host)
-				+ ((opt.port)?':'+opt.port:'');
-			com.wire = com.zmq.createSocket(opt.type);
-			com.wire.bind(com.src,function(e){
-				if(e){
-					console.log("com error: "+e);
-					return;
-				}
-				console.log(com.src);
-				com.wire.on('message', function(c,m){
-					m = m? m.toString() : c.toString();
-					com.msg(a.obj.ify(m),c);
-				});
-			});
-		});
 		com.node = (function(opt){
 			if(process.send){
 				process.on('message',function(m){
 					com.msg(a.obj.ify(m));
 				});
-				process.send({onOpen:{readyState:(process.readyState = 1),state:(a.obj.get(a,opt.way+'.state')?a[opt.way].state():false)}});
+				process.send({onOpen:{readyState:(process.readyState = 1)},mod:root.mods[opt.way]});
 				com.wire = process;
 				return;
 			}
@@ -567,40 +541,25 @@ var theory = (function(b,c,fn){
 				com.write(theory.com.queue.shift());
 			}
 		});
-		com.parse = (function(m){
-			if(a.obj.is(m)) return m;
-			try{
-				m = JSON.parse(m);
-			}catch(e){m={}};
-			return m;
-		});
 		com.msg = (function(m,c){
 			theory.obj.get(theory,theory(m,'how.way')+'->')(m,c);
 		});
 		com.ways = (function(m,w){
-			var way = com.way;
+			var way = w||a.obj.get(m,'how.way')||com.way;
 			if($=a.fns.$(this)){
-				way = ($.charAt(0)=='.')?way+$:$;
+				way = ($.charAt(0)=='.')?com.way+$:$;
 			}
-			m = com.meta(m,way);
+			return m = com.meta(m,way);
 		});
 		com.ask = (function(m,f){
 			if(!a.fns.is(f)) return;
-			var w = a.obj.get(m,'how.way')||com.way;
-			if($=a.fns.$(this)){
-				w = ($.charAt(0)=='.')?com.way+$:$;
-			}
-			m = com.meta(m,w);
+			m = com.ways(m);
 			delete m.where;
 			theory.com.asked[m.when] = f;
 			com.write(m);
 		});theory.com.asked = theory.com.asked||{};
 		com.reply = (function(m){
-			var w = a.obj.get(m,'how.way')||com.way;
-			if($=a.fns.$(this)){
-				w = ($.charAt(0)=='.')?com.way+$:$;
-			}
-			m = com.meta(m,w);
+			m = com.ways(m);
 			if(m.how.web === 'state'){
 				m.how.way = 'web.reply';
 			}
@@ -609,11 +568,7 @@ var theory = (function(b,c,fn){
 			com.write(m);
 		});
 		com.send = (function(m){
-			var w = a.obj.get(m,'how.way')||com.way;
-			if($=a.fns.$(this)){
-				w = ($.charAt(0)=='.')?com.way+$:$;
-			}
-			m = com.meta(m,w);
+			m = com.ways(m);
 			com.write(m);
 		});
 		com.write = (function(m,c){
@@ -735,6 +690,7 @@ var theory = (function(b,c,fn){
 	var root = root||{}, a = theory;
 	root.sec = ['all'];
 	root.name = 'theory';
+	root.mods = {};
 	root.queue = {};
 	root.launch = {};
 	root.pollute = ((typeof GLOBAL !== 'undefined' && GLOBAL.global && GLOBAL.process &&
@@ -744,6 +700,7 @@ var theory = (function(b,c,fn){
 			global.theory = theory;
 			process.env.totheory = __filename;
 			global.name = root.name;
+			global.mods = global.mods||{};
 			if(process.env.NODE_ENV==='production'){process.env.LIVE = true};
 			module.rel = require('path').dirname((module.parent||{}).filename);
 			module.exports=(function(cb,deps,name){
@@ -760,6 +717,7 @@ var theory = (function(b,c,fn){
 					}
 				},m);
 				console.log(m.name+'!');
+				global.mods[m.name] = a.obj.ify(a.text.ify(m));
 				var mod = (theory[m.name] = global.a[m.name] = cb(m.theory));
 				if(global.aname === m.name && theory.com) theory.com(root.name).init(m.name);
 				return mod;
@@ -799,8 +757,8 @@ var theory = (function(b,c,fn){
 					return _require;
 				}
 				if(util.stripify(p) == util.stripify(root.name)){
-					return (function(cb,deps){
-						return util.async(deps,cb);
+					return (function(n,cb,deps){
+						return util.async(deps,cb,n);
 					});
 				}
 				if(_require.cache[p] || window[p]){
@@ -809,8 +767,8 @@ var theory = (function(b,c,fn){
 				}
 				window.module.ajax.code(p,function(d){
 				});
-				return (function(cb,deps){
-					return util.async(deps,cb);
+				return (function(n,cb,deps){
+					return util.async(deps,cb,n);
 				});
 			});
 			require();
@@ -840,6 +798,7 @@ var theory = (function(b,c,fn){
 				return {
 					name: a.list(args.t).at(1)
 					,init: a.list(args.f).at(1)
+					,dependencies: a.list(args.l).at(1)
 				}
 			}
 		});
@@ -905,11 +864,11 @@ var theory = (function(b,c,fn){
 			}
 			if(args.l.length){
 				var ao = mod||a.list(args.l).at(1);
-				deps = ao.dependencies||ao.require||ao.dep;
+				deps = ao.dependencies||ao.require||ao.deps||ao.dep;
 			}
 			if(args.o.length){
 				var ao = mod||a.list(args.o).at(1);
-				deps = ao.dependencies||ao.require||ao.dep;
+				deps = ao.dependencies||ao.require||ao.deps||ao.dep;
 			}
 			(ao||mod).dependencies = deps;
 			a.list(deps).each(function(v,i){
@@ -939,11 +898,11 @@ var theory = (function(b,c,fn){
 			m.theory = util.theorize(m);
 			deps = _this.deps(args,function(j,o){
 				i = util.stripify(j);
-				if(!a(root.launch,i)){
-					if(!a(root.queue,i)){
+				if(!root.launch[i]){
+					if(!root.queue[i]){
 						_this.execute(j,m,o);
 					}
-					(root.queue[i] = a(root.queue,i) || []).push(m);
+					(root.queue[i] = root.queue[i] || []).push(m);
 					b = false;
 				}else{
 					m.theory[i] = theory[i];
@@ -959,7 +918,7 @@ var theory = (function(b,c,fn){
 		});
 		_this.drain = (function(p,o,m){
 			var b = true, l = true, d, cb;
-			d = a(root.queue,p);
+			d = root.queue[p];
 			if(d&&a.list.is(d)){
 				d = d.slice().reverse();
 			}else{
