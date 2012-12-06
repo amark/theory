@@ -1,5 +1,6 @@
 /** THEORY **/
-var theory = (function(b,c,fn){
+var theory=theory||null;if(theory){root.init()}else{
+theory=(function(b,c,fn){
 	var a = (this.name ==='theory' || b === true)? 
 			theory 
 		:	this
@@ -141,7 +142,11 @@ var theory = (function(b,c,fn){
 			opt.wedge = opt.wedge||':';
 			opt.split = opt.split||',';
 			var r = [];
-			if(a.obj(l).is()){ // TODO: BUG: Does not handle certain types correctly.
+			if(a.text.is(l)){
+				var r = new RegExp("\s*"+opt.split+"\s*",'ig');
+				return l.split(r);
+			} else
+			if(a.obj.is(l)){ // TODO: BUG: Does not handle certain types correctly.
 				a.obj(l).each(function(v,i){
 					r.push(i+opt.wedge+v);
 				});
@@ -384,6 +389,7 @@ var theory = (function(b,c,fn){
 			regex.is = /[\.\\\?\*\[\]\{\}\(\)\^\$\+\|\,]/ig
 			regex.special = {'.':1,'\\':1,'?':1,'*':1,'[':1,']':1,'{':1,'}':1,'(':1,')':1,'^':1,'$':1,'+':1,'|':1,',':1}
 			regex.mail = /^(("[\w-\s]+")|([\w-]+(?:[\.\+][\w-]+)*)|("[\w-\s]+")([\w-]+(?:[\.\+][\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i;
+			regex.base64 = new RegExp("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$");
 			regex.list = /(,\s|;\s|,|;|\s)/ig;
 			regex.css = /(.+?):(.+?);/ig;
 			regex.url = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
@@ -742,10 +748,7 @@ var theory = (function(b,c,fn){
 				console.log(e + " at line "+ l +" on "+ w);
 				//if(theory.com) theory.com.send({e:e,url:w,line:l});
 			});
-			var thiselem = document.getElementsByTagName('script');
-			thiselem = thiselem[thiselem.length-1];
-			window.require = window.module.ajax.code;
-			util.sandbox(thiselem.innerHTML,'Theory Configuration');
+			util.init();
 			if(theory.com) theory.com(root.name).init();
 			window.require = (function(p){
 				var _require = require;
@@ -802,7 +805,7 @@ var theory = (function(b,c,fn){
 				}
 			}
 		});
-		_this.launch = (function(m,i){
+		_this.launch = (function(m,i){ // TODO: BUG: path to module in init.
 			root.launch[m.name] = true;
 			a.obj(root.queue).each(function(v,i){
 				root.queue[i] = a.list(v).each(function(w,j,t){
@@ -825,6 +828,13 @@ var theory = (function(b,c,fn){
 			}catch(e){
 				console.log("sandbox fail: "+n);
 			}
+		});
+		_this.init = (function(){
+			if(!root.page) return;
+			var thiselem = document.getElementsByTagName('script');
+			thiselem = thiselem[thiselem.length-1];
+			window.require = window.module.ajax.code;
+			util.sandbox(thiselem.innerHTML,'Theory Configuration');
 		});
 		_this.execute = (function(p,m,o,fn){
 			var args = a.fns.sort(a.list.slit.call(arguments,0));
@@ -954,5 +964,6 @@ var theory = (function(b,c,fn){
 	})();
 	root.init = (function(){
 		root.pollute();
+		return util.init;
 	})();
-})();
+})()};
