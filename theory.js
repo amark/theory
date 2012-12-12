@@ -160,18 +160,28 @@ theory=(function(b,c,fn){
 			return l.concat(ll);
 		});
 		list.union = list.u = (function(l,ll){ //[1,2,3,4,5] u [3,5,6,7,8] = [1,2,3,4,5,6,7,8]
-			return l.not.implemented.yet;
+			return not_implemented_yet;
 			if($=a.fns.$(this)){
 				ll=l;l=$;
 			}
-			return [];
+			var r = l.slice();
+			a.list(ll).each(function(v,i){
+				if(!a.list(l).each(v)){
+					r.push(v);
+				}
+			});
+			return r;
 		});
 		list.intersect = list.n = (function(l,ll){ //[1,2,3,4,5] n [3,5,6,7,8] = [3,5]
-			return l.not.implemented.yet;
+			return not_implemented_yet;
 			if($=a.fns.$(this)){
 				ll=l;l=$;
 			}
-			return [];
+			return a.list(l).each(function(v,i,e){
+				if(a.list(ll).each(v)){
+					e(v);
+				}
+			});
 		});
 		list.get = (function(l,i,fn){
 			if($=a.fns.$(this)){
@@ -256,7 +266,7 @@ theory=(function(b,c,fn){
 					}else{
 						// not an array, iterate over an object
 						for(i in array){
-							if(array.hasOwnProperty(i)){
+							if(a.obj.has(array,i)){
 								var newValue = callback.call(thisObject, array[i], i, emit);
 							}
 							if(newValue !== undefined){
@@ -328,6 +338,12 @@ theory=(function(b,c,fn){
 			}
 			return a.list._each(o,c,t);
 		});
+		obj.has = (function(o,k){
+			if($=a.fns.$(this)){
+				k=o;o=$;
+			}
+			return Object.prototype.hasOwnProperty.call(o, k);
+		});
 		obj.get = (function(o,l){
 			if($=a.fns.$(this)){
 				l=o;o=$;
@@ -343,7 +359,7 @@ theory=(function(b,c,fn){
 				l = (/\//g.test(l))? [l] : l.split(a.text.find.__.dot);
 			}
 			return a.list(l||[]).each(function(v,i){
-				if(!(o||{}).hasOwnProperty(v)) return nf? null : function(){};
+				if(!a.obj.has((o||{}),v)) return nf? null : function(){};
 				o = o[v];
 				if(l.length == i){
 					return nf? o : (a.fns.is(o)? o : function(){});
