@@ -2,8 +2,4 @@ Theory
 ==========
 Theory is an abstraction layer for server side and client side JavaScript.
 
-### How it works
-
-	;
-
-Docs being worked on now, at LA OpenSource Hackathon.
+For some documentation, see the Coalesce framework for now, until I have time to write awesome docs here.

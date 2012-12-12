@@ -529,7 +529,7 @@ theory=(function(b,c,fn){
 					console.log("Communication initiated at "+com.src+" with "+com.wire.protocol+".");
 					com.drain();
 				};
-				theory.com.wire.onmessage = function(m){
+				theory.com.wire.onmessage = theory.com.municate||function(m){
 					m = a.obj.ify(m.data||m);
 					if(theory.com.asked[m.when]){
 						a(theory.com.asked,m.when+"->")(m);
@@ -552,17 +552,30 @@ theory=(function(b,c,fn){
 				});
 			}
 		});
+		com.drain = (function(){
+			while(theory.com.queue.length > 0){
+				com.write(theory.com.queue.shift());
+			}
+		});
+		com.write = (function(m,c){
+			c = c||theory.com.wire;
+			if(!c || c.readyState !== 1){
+				theory.com.queue.push(m);
+				return;
+			}
+			if(a.obj.is(m)){
+				m = a.text(m).ify();
+			}
+			//console.log("send --> "+m);
+			c.send(m);
+		});
 		com.init = (function(c){
 			if(root.node) com.node({way:c});
 			if(c) return;
 			if(root.page) com.page();
 			return com;
 		});
-		com.drain = (function(){
-			while(theory.com.queue.length > 0){
-				com.write(theory.com.queue.shift());
-			}
-		});
+		/** Helpers **/
 		com.msg = (function(m,c){
 			theory.obj.get(theory,theory(m,'how.way')+'->')(m,c);
 		});
@@ -592,18 +605,6 @@ theory=(function(b,c,fn){
 		com.send = (function(m){
 			m = com.ways(m);
 			com.write(m);
-		});
-		com.write = (function(m,c){
-			c = c||theory.com.wire;
-			if(!c || c.readyState !== 1){
-				theory.com.queue.push(m);
-				return;
-			}
-			if(a.obj.is(m)){
-				m = a.text(m).ify();
-			}
-			//console.log("send --> "+m);
-			c.send(m);
 		});
 		com.meta = (function(m,opt){
 			if(!a.obj.is(m)) m = {what:m};
@@ -696,7 +697,7 @@ theory=(function(b,c,fn){
 			}
 			m.where = n.where;
 			return n;
-		});
+		}); /** END HELPERS **/
 		return com;
 	});
 	a.test = (function(b,c,fn){
