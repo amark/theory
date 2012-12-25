@@ -14,7 +14,7 @@ theory=(function(b,c,fn){
 			if(c){
 				a = c.theory;
 			}
-		}else{
+		} else {
 			return (function(args,n){
 				args = theory.fns.sort(args);
 				r = {};
@@ -49,9 +49,9 @@ theory=(function(b,c,fn){
 				fn = tmp;
 			}
 			// Quick check to determine if target is callable, in the spec
-			// this throws a TypeError, but we will just return undefined.
-			if (!this.is(fn)) {
-				return undefined;
+			// this throws a TypeError, but we will just return null.
+			if (!fns.is(fn)) {
+				return null;
 			}
 			// Simulated bind
 			var args = a.list.slit.call(arguments,2),
@@ -119,18 +119,23 @@ theory=(function(b,c,fn){
 		});
 		list.slit = Array.prototype.slice;
 		list.at = (function(l,i,fn){
-			if($=a.fns.$(this)){ fn=i;i=l;l=$ }
-			if(!l||!i){ return false }
+			if($=a.fns.$(this)){ i=l;l=$ }
+			if(!l||!i){ return undefined }
 			if(a.text.is(l)){ l = l.split('') }
 			if(i < 0){
-				var r = l.slice().reverse();
+				l = l.slice().reverse();
 				i = Math.abs(i);
-			}
-			for(--i; 0 <= i; i--){	// upgrade to functionalize
-				if(r && r[i]){ return r[i] }
-				else if(l[i]){ return l[i] }
-			}
-			return false;
+			} if(a.fns.is(fn)){ return fn(l,i) }
+			return l[--i];
+		});
+		list.ebb = (function(l,i){
+			return list.at(l,i,function(r,i){
+				for(--i; 0 <= i; i--){	// upgrade to functionalize
+					if(r && r[i] !== undefined){ return r[i] }
+					else if(l[i] !== undefined){ return l[i] }
+				}
+				return undefined;
+			});
 		});
 		list.ify = (function(l,opt){
 			if($=a.fns.$(this)){ opt=l;l=$ }
@@ -144,14 +149,20 @@ theory=(function(b,c,fn){
 			} else
 			if(a.obj.is(l)){ // TODO: BUG: Does not handle certain types correctly.
 				a.obj(l).each(function(v,i){
+					if(a.obj.is(v)){
+						r.push(v);
+						return;
+					}
 					r.push(i+opt.wedge+v);
 				});
 			}
 			return r;
 		});
-		list.merge = (function(l,ll){
-			if($=a.fns.$(this)){ ll=l;l=$ }
-			return l.concat(ll);
+		list.fuse = (function(l){
+			var args = a.list.slit.call(arguments, 0), ll;
+			l = ($=a.fns.$(this))||l;
+			ll = $? a.fns.sort(args).l : a.fns.sort(args).l.slice(1);
+			return Array.prototype.concat.apply(l,ll);
 		});
 		list.union = list.u = (function(l,ll){ //[1,2,3,4,5] u [3,5,6,7,8] = [1,2,3,4,5,6,7,8]
 			return not_implemented_yet;
@@ -163,10 +174,6 @@ theory=(function(b,c,fn){
 			return not_implemented_yet;
 			if($=a.fns.$(this)){ ll=l;l=$ }
 			// yeaah, try again.
-		});
-		list.get = (function(l,i,fn){
-			if($=a.fns.$(this)){ fn=i;i=l;l=$ }
-			return list.at(l,i,fn);
 		});
 		list.plop = (function(l,s){
 			if($=a.fns.$(this)){ s=l;l=$ }
@@ -616,6 +623,54 @@ theory=(function(b,c,fn){
 	});
 	a.test = (function(b,c,fn){
 		try{return b()}catch(e){return e};
+		test.is = (function(a, b, aStack, bStack){ // via Underscore
+			var _ = {isFunction:function(obj){return typeof obj === 'function'}
+				,has:function(obj,key){return hasOwnProperty.call(obj,key)}};
+			aStack = aStack||[]; bStack = bStack||[];
+			// Identical objects are equal. `0 === -0`, but they aren't identical.
+			if(a === b){ return a !== 0 || 1 / a == 1 / b }
+			if(a == null || b == null){ return a === b }
+			var className = toString.call(a);
+			if(className != toString.call(b)){ return false }
+			switch(className){
+				case '[object String]': return a == String(b);
+				case '[object Number]': return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
+				case '[object Date]':
+				case '[object Boolean]': return +a == +b;
+				case '[object RegExp]': return a.source == b.source && a.global == b.global && 
+					a.multiline == b.multiline && a.ignoreCase == b.ignoreCase;
+			}
+			if(typeof a != 'object' || typeof b != 'object'){ return false }
+			var length = aStack.length;
+			while(length--){ if(aStack[length] == a){ return bStack[length] == b} }
+			aStack.push(a); bStack.push(b);
+			var size = 0, result = true;
+			if(className == '[object Array]'){
+				size = a.length; result = size == b.length;
+				if(result){
+					while(size--){
+						if(!(result = eq(a[size], b[size], aStack, bStack))){ break }
+					}
+				}
+			}else{
+				var aCtor = a.constructor, bCtor = b.constructor;
+				if(aCtor !== bCtor && !(_.isFunction(aCtor) && (aCtor instanceof aCtor) && 
+					_.isFunction(bCtor) && (bCtor instanceof bCtor))){ return false }
+				for(var key in a){
+					if(_.has(a, key)){
+						size++;
+						if(!(result = _.has(b, key) && eq(a[key], b[key], aStack, bStack))){ break }
+					}
+				} if(result){
+					for(key in b){
+						if(_.has(b, key) && !(size--)){ break }
+					} result = !size;
+				}
+			}
+			aStack.pop(); bStack.pop();
+			return result;
+		});
+		return test;
 	});
 	return a;
 });theory(true);
@@ -842,7 +897,7 @@ theory=(function(b,c,fn){
 					}
 					(root.queue[i] = root.queue[i] || []).push(m);
 					b = false;
-				}else{
+				} else {
 					m.theory[i] = theory[i];
 				}
 			},m);
@@ -859,7 +914,7 @@ theory=(function(b,c,fn){
 			d = root.queue[p];
 			if(d&&a.list.is(d)){
 				d = d.slice().reverse();
-			}else{
+			} else {
 				d = [];
 			}
 			a.obj(root.queue).each(function(v,i){

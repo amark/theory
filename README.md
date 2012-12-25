@@ -1,4 +1,4 @@
-﻿Theory
+Theory
 ==========
 Theory is an abstraction layer for server side and client side JavaScript.
 
@@ -56,12 +56,6 @@ For some documentation, see the Coalesce framework for now, until I have time to
 	- *Note:* No guarantee of these working or being available in future versions.
 
 # Lists
-- **at** `a.list.at(what, index)`
-	- what is the list you want to access.
-	- index is the where in the list you want to retrieve the value.
-	- Examples
-		- `a.list.at([5,6,7,8,9],-2)` → `8`
-		- `a.list([5,6,7,8,9]).at(2)` → `6`
 - **ify** `a.list.ify(what, opt)`
 	- what is the text or object that you want to convert into a list.
 	- opt is the options parameter.
@@ -72,5 +66,24 @@ For some documentation, see the Coalesce framework for now, until I have time to
 		- `a.list({a:1,b:'c',d:[1,2,3]}).ify()` → `['a:1','b:c','d:0,1,2']`
 		- `a.list({session:'AK41795'}).ify({wedge:'='})` → `['session=AK41795']`
 		- `a.list.ify("1,2,3 ; 4,5,6",{split:';'})` → `["1,2,3", "4,5,6"]`
+- **at** `a.list.at(what, index)`
+	- what is the list you want to access.
+	- index is the where in the list you want to retrieve the value.
+	- Examples
+		- `a.list.at([5,6,7,8,9],-2)` → `8`
+		- `a.list([5,6,7,8,9]).at(2)` → `6`
+- **ebb** `a.list.ebb(what, index)`
+	- what is the list you want to access, similar to `at`, above.
+	- index is where, but if you over reach, it will cascade till it finds the closest item.
+	- Examples
+		- `a.list.ebb([2,3,4],9)` → `4`
+		- `a.list([0,1,2]).ebb(-9)` → `0`
+		- `a.list.ebb([5,6,7],-2)` → `6`
+- **fuse** `a.list.fuse(what, ...)`
+	- what is the list that other lists will fuse into.
+	- ... any number of extra list parameters.
+	- Examples
+		- `a.list.fuse([2,3],[4,5],[6,7])` → `[2,3,4,5,6,7]`
+		- `a.list([2,3]).fuse([4,5],[6,7])` → `[2,3,4,5,6,7]`
 
 [[ .. to be continued ]]
