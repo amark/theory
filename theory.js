@@ -83,7 +83,7 @@ theory=(function(b,c,fn){
 			return t.next();
 		});
 		fns.sort = (function(args){
-			if(!args) return {e:"Empty"};
+			if(!args){ return {e:"Empty"} }
 			var args = a.list.slit.call(args, 0), r = {b:[],n:[],t:[],l:[],o:[],f:[]}
 			for(var i in args){
 				if (this.is(args[i])){
@@ -92,7 +92,7 @@ theory=(function(b,c,fn){
 					r.l.push(args[i]);
 				} else if(a.obj.is(args[i])){
 					r.o.push(args[i]);
-				} else if(a.num.is(args[i])) {
+				} else if(a.num.is(args[i])){
 					r.n.push(args[i]);
 				} else if(a.text.is(args[i])){
 					r.t.push(args[i]);
@@ -119,31 +119,27 @@ theory=(function(b,c,fn){
 		});
 		list.slit = Array.prototype.slice;
 		list.at = (function(l,i,fn){
-			if($=a.fns.$(this)){
-				fn=i;i=l;l=$;
-			}
-			if(!l||!i) return false;
-			if(a.text.is(l)) l = l.split("");
-			if(i < 0) {
+			if($=a.fns.$(this)){ fn=i;i=l;l=$ }
+			if(!l||!i){ return false }
+			if(a.text.is(l)){ l = l.split('') }
+			if(i < 0){
 				var r = l.slice().reverse();
 				i = Math.abs(i);
 			}
 			for(--i; 0 <= i; i--){	// upgrade to functionalize
-				if(r && r[i]) return r[i];
-				else if(l[i]) return l[i];
+				if(r && r[i]){ return r[i] }
+				else if(l[i]){ return l[i] }
 			}
 			return false;
 		});
 		list.ify = (function(l,opt){
-			if($=a.fns.$(this)){
-				opt=l;l=$;
-			}
+			if($=a.fns.$(this)){ opt=l;l=$ }
 			opt=opt||{};
 			opt.wedge = opt.wedge||':';
 			opt.split = opt.split||',';
 			var r = [];
 			if(a.text.is(l)){
-				var r = new RegExp("\s*"+opt.split+"\s*",'ig');
+				var r = new RegExp("\\s*\\"+opt.split+"\\s*",'ig');
 				return l.split(r);
 			} else
 			if(a.obj.is(l)){ // TODO: BUG: Does not handle certain types correctly.
@@ -154,70 +150,45 @@ theory=(function(b,c,fn){
 			return r;
 		});
 		list.merge = (function(l,ll){
-			if($=a.fns.$(this)){
-				ll=l;l=$;
-			}
+			if($=a.fns.$(this)){ ll=l;l=$ }
 			return l.concat(ll);
 		});
 		list.union = list.u = (function(l,ll){ //[1,2,3,4,5] u [3,5,6,7,8] = [1,2,3,4,5,6,7,8]
 			return not_implemented_yet;
-			if($=a.fns.$(this)){
-				ll=l;l=$;
-			}
-			var r = l.slice();
-			a.list(ll).each(function(v,i){
-				if(!a.list(l).each(v)){
-					r.push(v);
-				}
-			});
+			if($=a.fns.$(this)){ ll=l;l=$ }
+			// yeaaah, try again.
 			return r;
 		});
 		list.intersect = list.n = (function(l,ll){ //[1,2,3,4,5] n [3,5,6,7,8] = [3,5]
 			return not_implemented_yet;
-			if($=a.fns.$(this)){
-				ll=l;l=$;
-			}
-			return a.list(l).each(function(v,i,e){
-				if(a.list(ll).each(v)){
-					e(v);
-				}
-			});
+			if($=a.fns.$(this)){ ll=l;l=$ }
+			// yeaah, try again.
 		});
 		list.get = (function(l,i,fn){
-			if($=a.fns.$(this)){
-				fn=i;i=l;l=$;
-			}
+			if($=a.fns.$(this)){ fn=i;i=l;l=$ }
 			return list.at(l,i,fn);
 		});
 		list.plop = (function(l,s){
-			if($=a.fns.$(this)){
-				s=l;l=$;
-			}
+			if($=a.fns.$(this)){ s=l;l=$ }
 			for(var i = l.length-1; 0 <= i; i--){
-				if(l[i] == s) {
+				if(l[i] == s){
 					return l.splice(i, 1);
 				}
 			}
 		});
 		list.find = (function(l,c,t){
-			if($=a.fns.$(this)){
-				t=c;c=l;l=$;
-			}
+			if($=a.fns.$(this)){ t=c;c=l;l=$ }
 			return list._each(l,c,t);
 		});
 		list.each = (function(l,c,t){
-			if($=a.fns.$(this)){
-				t=c;c=l;l=$;
-			}
+			if($=a.fns.$(this)){ t=c;c=l;l=$ }
 			return list._each(l,c,t);
 		});
 		list.crunch = (function(l,c,t){
-			if($=a.fns.$(this)){
-				t=c;c=l;l=$;
-			}
+			if($=a.fns.$(this)){ t=c;c=l;l=$ }
 			return list._each(l,function(v,i,t){
-				if(!v) return;
-				if(list.is(v) && !v.length) return;
+				if(!v){ return }
+				if(list.is(v) && !v.length){ return }
 				t(v);
 			});
 		});
@@ -294,20 +265,20 @@ theory=(function(b,c,fn){
 		obj.$ = $ !== undefined? $ : null;$=null;
 		obj.is = (function(o){
 			o = a.fns.$(this)||o;
-			return (o instanceof Object && !a.list.is(o))? true : false;
+			return (o instanceof Object && !a.list.is(o) && !a.fns.is(o))? true : false;
 		});
 		obj.ify = (function(o){
 			o = a.fns.$(this)||o;
-			if(a.obj.is(o)) return o;
+			if(a.obj.is(o)){ return o }
 			try{
 				o = JSON.parse(o);
 			}catch(e){o={}};
 			return o;
 		});
 		obj.empty = (function(o){
-			if(!(o = a.fns.$(this)||o)) return true;
+			if(!(o = a.fns.$(this)||o)){ return true }
 			return obj.each(o,function(v,i){
-				if(i) return true;
+				if(i){ return true }
 			})? false : true;
 		});
 		obj.copy = (function(o){
@@ -319,9 +290,7 @@ theory=(function(b,c,fn){
 			return r;
 		});
 		obj.union = obj.u = (function(x,y){
-			if($=a.fns.$(this)){
-				y=x;x=$;
-			}
+			if($=a.fns.$(this)){ y=x;x=$ }
 			x = x||{}; y = y||{};
 			var o = {};
 			a.obj.each(x,function(v,i,t){
@@ -333,33 +302,25 @@ theory=(function(b,c,fn){
 			return o;
 		});
 		obj.each = (function(o,c,t){
-			if($=a.fns.$(this)){
-				t=c;c=o;o=$;
-			}
+			if($=a.fns.$(this)){ t=c;c=o;o=$ }
 			return a.list._each(o,c,t);
 		});
 		obj.has = (function(o,k){
-			if($=a.fns.$(this)){
-				k=o;o=$;
-			}
+			if($=a.fns.$(this)){ k=o;o=$ }
 			return Object.prototype.hasOwnProperty.call(o, k);
 		});
 		obj.get = (function(o,l){
-			if($=a.fns.$(this)){
-				l=o;o=$;
-			}
-			if(a.num.is(l)){
-				l = a.text.ify(l);
-			}
-			if(a.list.is(l)){
-				l = l.join('.');
-			}
+			if($=a.fns.$(this)){ l=o;o=$ }
+			if(a.num.is(l)){ l = a.text.ify(l) }
+			if(a.list.is(l)){ l = l.join('.') }
 			if(a.text.is(l)){
 				nf = (l.length == (l = l.replace(a.text.find.__.fn,'')).length);
 				l = (/\//g.test(l))? [l] : l.split(a.text.find.__.dot);
 			}
 			return a.list(l||[]).each(function(v,i){
-				if(!a.obj.has((o||{}),v)) return nf? null : function(){};
+				if(!a.obj.has((o||{}),v)){ 
+					return nf? null : function(){};
+				} 
 				o = o[v];
 				if(l.length == i){
 					return nf? o : (a.fns.is(o)? o : function(){});
@@ -376,15 +337,13 @@ theory=(function(b,c,fn){
 			t = (($=a.fns.$(this))!==null)?$:t;
 			return typeof t == 'string'?true:false;
 		});
-		text.get = (function(q){
-			return;
-		});
+		text.get = (function(q){ return });
 		text.ify = (function(t){
-			t = a.fns.$(this)||t||'';
-			if(a.obj.is(t)) return JSON.stringify(t);
+			t = (($=a.fns.$(this))!==null)?$:t;
+			if(JSON){ return JSON.stringify(t) }
 			return t.toString? t.toString():t;
 		});
-		text.random = (function(l){
+		text.random = text.r = (function(l){
 			l = (a.fns.$(this)||l)||16;
 			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz',s='';
 			while(l>0){
@@ -394,9 +353,7 @@ theory=(function(b,c,fn){
 			return s;
 		});
 		text.clip = (function(t,r,s,e){
-			if($=a.fns.$(this)){
-				e=s;s=r;r=t;t=$;
-			}
+			if($=a.fns.$(this)){ e=s;s=r;r=t;t=$ }
 			return (t||'').split(r).slice(s,e).join(r);
 		});
 		text.find = (function(_this){
@@ -412,7 +369,8 @@ theory=(function(b,c,fn){
 			regex.ext = /\.([^\.]+)$/i;
 			regex.ws_ = /\-/ig;
 			regex.space = /\s/ig;
-			regex.num = { 'int': /(\-\d+|\d+)/g };
+			regex.num = /(\-\d+\.\d+|\d+\.\d+|\-\d+|\d+)/g;
+			regex['int'] = /(\-\d+|\d+)/g;
 			regex.__ = { fn: /\-\>$/, dot: /\./ };
 			return regex;
 		})(text);
@@ -436,35 +394,39 @@ theory=(function(b,c,fn){
 			n = (($=a.fns.$(this))!==null)?$:n;
 			return ( (n===0)? true : (!isNaN(n) && !a.bi.is(n) && !a.list.is(n) && !a.text.is(n))? true : false);
 		});
-		num.get = (function(i){
-			return;
+		num.get = (function(i){ return });
+		num.i = (function(n){return parseInt(a.fns.$(this)||n,10)});
+		num.dec = (function(n){return parseFloat(a.fns.$(this)||n)});
+		num.ify = (function(n,o){
+			if(($=a.fns.$(this))!==null){ o=n;n=$ }
+			var r, l = a.list.is(o);
+			if(a.list.is(o)){
+				if(a.num.is(n)){
+					return [n];
+				} if(a.text.is(n)){
+					r = n.match(a.text.find.num) || [];
+					return a.list(r).each(function(v,i,t){
+						t(a.num.ify(v));
+					});
+				}
+			}
+			r = num.dec(n);
+			if(a.num.is(r)){ return r }
+			if(!n){	return }
+			if(a.text.is(n)){
+				return a.num.ify( (n.match(a.text.find.num)||[])[0] );
+			}
 		});
-		num.i = (function(val){return parseInt($||val,10)});
-		num.dec = (function(val){return parseFloat($||val)||0});
 		num.random = num.r = (function(l){
 			l = ((($=a.fns.$(this))!==null)?$:l)||6;
 			l = (l<=14)? l : 14;
 			var n = '9';
 			for(var i = 0; i < l-1; i++){ n += '0';}
-			n = a.num.i(n);
+			n = a.num.ify(n);
 			var r = function(){return Math.floor(Math.random()*10)||r()};
 			n = Math.floor(r() + Math.pow(Math.random(),Math.random()) * (n));
-			if(n.toString().length != l) return num.r(l);
+			if(n.toString().length != l){ return num.r(l) }
 			return n;
-		});
-		num.ii = (function(n){
-			n = a.fns.$(this)||n;
-			if(!n) {
-				return []; 
-			}else if(a.num.is(n)){
-				return [n] 
-			} else {
-				r = n.match(a.text.find.num['int']) || [];
-				r = a.list.each(r,function(v,i,t){
-					t(num.i(v));
-				});
-				return r;
-			}
 		});
 		return num;
 	});a.num();
@@ -485,7 +447,7 @@ theory=(function(b,c,fn){
 			return (+new Date().getTime())
 		});
 		time.now = (function(){
-			return a.num.i((a.time.is().toString())+a.num.r(4))
+			return a.num.ify((a.time.is().toString())+a.num.r(4))
 		});
 		time.loop = (function(fn,d){
 			var args = a.fns.sort(a.list.slit.call(arguments, 0));
@@ -543,7 +505,7 @@ theory=(function(b,c,fn){
 					theory.com.close&&theory.com.close(m);
 				};
 			});
-			if(com.off) return;
+			if(com.off){ return }
 			if(window.SockJS){
 				municate();
 			} else {
@@ -570,9 +532,9 @@ theory=(function(b,c,fn){
 			c.send(m);
 		});
 		com.init = (function(c){
-			if(root.node) com.node({way:c});
-			if(c) return;
-			if(root.page) com.page();
+			if(root.node){ com.node({way:c}) }
+			if(c){ return }
+			if(root.page){ com.page() }
 			return com;
 		});
 		/** Helpers **/
@@ -587,7 +549,7 @@ theory=(function(b,c,fn){
 			return m = com.meta(m,way);
 		});
 		com.ask = (function(m,f){
-			if(!a.fns.is(f)) return;
+			if(!a.fns.is(f)){ return }
 			m = com.ways(m);
 			delete m.where;
 			theory.com.asked[m.when] = f;
@@ -607,95 +569,47 @@ theory=(function(b,c,fn){
 			com.write(m);
 		});
 		com.meta = (function(m,opt){
-			if(!a.obj.is(m)) m = {what:m};
+			if(!a.obj.is(m)){ m = {what:m} }
 			var n = {what: (m.what = m.what||{}) };
 			opt = opt||{c:{}};
-			if(a.text.is(opt)){
-				opt = {w:opt,c:{}};
-			}
-			if(opt.protocol){
-				opt.c = opt;
-			}
+			if(a.text.is(opt)){ opt = {w:opt,c:{}} }
+			if(opt.protocol){ opt.c = opt }
 			a.obj(m).each(function(v,i){
-				if( i == 'how' ||
-					i == 'who' || i == 'what' ||
-					i == 'when'|| i == 'where'){
-					return;
-				}
-				n.what[i] = m.what[i] = v;
-				delete m[i];
+				if( i == 'how' || i == 'who' || i == 'what' ||
+					i == 'when'|| i == 'where'){ return }
+				n.what[i] = m.what[i] = v; delete m[i];
 			});
-			if(!m.how){
-				n.how = {
-					way: opt.w||com.way
-				}
-			}else{
+			if(!m.how){ n.how={way: opt.w||com.way} }else{
 				n.how = m.how;
 				n.how.way = opt.w||m.how.way||com.way;
 				delete m.how;
-			}
-			m.how = n.how;
-			if(!m.when){
-				n.when = a.time.now();
-			}else{
+			} m.how = n.how;
+			if(!m.when){ n.when=a.time.now() }else{
 				n.when = m.when;
 				delete m.when;
-			}
-			m.when = n.when;
-			if(!m.who){
+			} m.when = n.when;
+			if(!m.who){ 
 				if(root.page && !com.who){
-					n.who = {
-						tid: (com.who=root.who)
-					}
-				}
-				if(root.node){
-					n.who = {};
-				}
+					n.who = { tid: (com.who=root.who) }
+				} if(root.node){ n.who = {} }
 			}else{
-				if(a.obj.is(m.who)){
-					n.who = m.who;
-				}else{
-					n.who = {
-						to: m.who
-					}
-				}
-				if(root.node){
-				}
-				if(root.page && !com.who){
+				if(a.obj.is(m.who)){ n.who=m.who }else{
+					n.who = {to: m.who}
+				} if(root.node){
+				} if(root.page && !com.who){
 					n.who.tid = com.who = root.who;
-				}
-				delete m.who;
-			}
-			m.who = n.who;
+				} delete m.who;
+			} m.who = n.who;
 			if(!m.where){
-				if(root.page){
-					if(a.text.is(m.where)){
-					
-					}else{
-					
-					}
-				}
-				if(root.node){
-					n.where = {
-						pid: process.pid
-					}
-				}
+				if(root.page){ if(a.text.is(m.where)){}else{};
+				} if(root.node){ n.where={pid: process.pid} }
 			}else{
-				if(a.obj.is(m.where)){
-					n.where = m.where;
-				}else{
-					n.where = {
-						at: m.where
-					}
-				}
-				if(root.node){
-					if(!a.obj.get(m,'where.pid')){
-						n.where.pid = process.pid;
-					}
-				}
-				delete m.where;
-			}
-			m.where = n.where;
+				if(a.obj.is(m.where)){ n.where = m.where }else{ 
+					n.where = {at: m.where};
+				} if(root.node){
+					if(!a.obj.get(m,'where.pid')){ n.where.pid=process.pid }
+				} delete m.where;
+			} m.where = n.where;
 			return n;
 		}); /** END HELPERS **/
 		return com;
@@ -761,32 +675,29 @@ theory=(function(b,c,fn){
 				a.onload=a.onreadystatechange=function(){if(/de|m/.test(a.readyState||"m")){c&&c();document.body.removeChild(a);try{for(c in a)delete a[c]}catch(b){}}};
 				a.src=b;z=function(){document.body?document.body.appendChild(a):s(z,1)};s(z,1)})};
 			window.module.ajax.code = util.execute;
+			window.JSON = window.JSON || false;
 			window.onerror = (function(e,w,l){
 				console.log(e + " at line "+ l +" on "+ w);
-				//if(theory.com) theory.com.send({e:e,url:w,line:l});
+				//if(theory.com){ theory.com.send({e:e,url:w,line:l}) }
 			});
 			util.init();
-			if(theory.com) theory.com(root.name).init();
+			if(theory.com){ theory.com(root.name).init() }
 			window.require = (function(p){
 				var _require = require;
 				_require.resolve = (function(){
 				
 				});
 				_require.cache = _require.cache||{};
-				if(!p){
-					return _require;
-				}
+				if(!p){ return _require } 
 				if(util.stripify(p) == util.stripify(root.name)){
 					return (function(n,cb,deps){
 						return util.async(deps,cb,n);
 					});
-				}
-				if(_require.cache[p] || window[p]){
+				} if(_require.cache[p] || window[p]){
 					console.log(p+' already cached');
 					return _require.cache[p];
 				}
-				window.module.ajax.code(p,function(d){
-				});
+				window.module.ajax.code(p,function(d){ });
 				return (function(n,cb,deps){
 					return util.async(deps,cb,n);
 				});
@@ -796,9 +707,9 @@ theory=(function(b,c,fn){
 	);
 	var util = (function(){
 		var _this = {};
-		_this.pathify = (function(p){return p = (/\.js$/i.test(p))? p : p+'.js'; });
+		_this.pathify = (function(p){ return p = (/\.js$/i.test(p))? p : p+'.js'; });
 		_this.stripify = (function(p){
-			if(!a.text.is(p)) return '';
+			if(!a.text.is(p)){ return '' }
 			p=p.replace(/^\./,'');
 			return (p.split('/').reverse()[0]).replace(/\.js$/i,'');
 		});
@@ -808,11 +719,11 @@ theory=(function(b,c,fn){
 			}
 			if(args.l.length){
 				var ao = a.list(args.l).at(1);
-				if(ao.name) return ao;
+				if(ao.name){ return ao }
 			}
 			if(args.o.length){
 				var ao = a.list(args.o).at(1);
-				if(ao.name) return ao;
+				if(ao.name){ return ao }
 			}
 			if(args.f.length){
 				return {
@@ -847,7 +758,7 @@ theory=(function(b,c,fn){
 			}
 		});
 		_this.init = (function(){
-			if(!root.page) return;
+			if(!root.page){ return }
 			var thiselem = document.getElementsByTagName('script');
 			thiselem = thiselem[thiselem.length-1];
 			window.require = window.module.ajax.code;
@@ -875,7 +786,7 @@ theory=(function(b,c,fn){
 				}
 				module.exports = exports = {};
 				util.drain(p,o,m);
-				if(theory.fns.is(fn)) fn(d);
+				if(theory.fns.is(fn)){ fn(d) }
 				return theory[p];
 			});
 			try{window.module.ajax.load(util.pathify(p),function(d){
@@ -915,7 +826,7 @@ theory=(function(b,c,fn){
 				}
 				return theory(true,m);
 			});m.theory();
-			if(m.theory.com) m.theory.com(m.name);
+			if(m.theory.com){ m.theory.com(m.name) }
 			return m.theory;
 		});
 		_this.async = (function(deps,cb){
@@ -963,7 +874,7 @@ theory=(function(b,c,fn){
 			}
 			a.list(d).each(function(v,i){
 				b = true;
-				if(l && v.theory) v.theory[p] = theory[p];
+				if(l && v.theory){ v.theory[p] = theory[p] }
 				a.list(v.dependencies).each(function(w,j){
 					if(!root.launch[(j=util.stripify(a.list.is(v.dependencies)?w:j))]){
 						return b = false;
