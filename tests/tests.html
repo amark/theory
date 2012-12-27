@@ -7,13 +7,14 @@
 				font-size: 200%;
 			}
 		</style>
-		<script src="../theory.js">
-			require('./test');
-		</script>
 	</head>
 	<body>
 		Tests initiating...
-		<pre id="test">
+		<pre id="tests">
 		</pre>
+		<script src="../theory.js">
+			theory.com.off = true;
+			require('./tests');
+		</script>
 	</body>
 </html>

@@ -41,27 +41,6 @@ theory=(function(b,c,fn){
 			$ = this.$_;this.$_=null;fn = $||fn;
 			return (fn instanceof Function)? true : false;
 		});
-		fns.ids = 1;
-		fns.pass = (function(fn,context){ // from jQuery.proxy()
-			if (a.text.is(context)){
-				var tmp = a(fn,context);//fn[context];
-				context = fn;
-				fn = tmp;
-			}
-			// Quick check to determine if target is callable, in the spec
-			// this throws a TypeError, but we will just return null.
-			if (!fns.is(fn)) {
-				return null;
-			}
-			// Simulated bind
-			var args = a.list.slit.call(arguments,2),
-				proxy = function() {
-					return fn.apply(context,args.concat(a.list.slit.call(arguments)));
-				};
-			// Set the guid of unique handler to the same of original handler, so it can be removed
-			proxy.id = fn.id = fn.id || proxy.id || this.ids++;
-			return proxy;
-		});
 		fns.flow = (function(sync,fn){
 			fn = fn||(function(){});
 			if(!a.list.is(sync) || !sync.length){
@@ -107,6 +86,27 @@ theory=(function(b,c,fn){
 			t.$=null;
 			return v;
 		});
+		fns.ids = 1;
+		fns.pass = (function(fn,context){ // from jQuery.proxy()
+			if (a.text.is(context)){
+				var tmp = a(fn,context);//fn[context];
+				context = fn;
+				fn = tmp;
+			}
+			// Quick check to determine if target is callable, in the spec
+			// this throws a TypeError, but we will just return null.
+			if (!fns.is(fn)) {
+				return null;
+			}
+			// Simulated bind
+			var args = a.list.slit.call(arguments,2),
+				proxy = function() {
+					return fn.apply(context,args.concat(a.list.slit.call(arguments)));
+				};
+			// Set the guid of unique handler to the same of original handler, so it can be removed
+			proxy.id = fn.id = fn.id || proxy.id || this.ids++;
+			return proxy;
+		});
 		return fns;
 	});a.fns();
 	a.list = (function($){
@@ -143,17 +143,16 @@ theory=(function(b,c,fn){
 			opt.wedge = opt.wedge||':';
 			opt.split = opt.split||',';
 			var r = [];
+			if(a.list.is(l)){
+				return l;
+			} else
 			if(a.text.is(l)){
 				var r = new RegExp("\\s*\\"+opt.split+"\\s*",'ig');
 				return l.split(r);
 			} else
-			if(a.obj.is(l)){ // TODO: BUG: Does not handle certain types correctly.
+			if(a.obj.is(l)){
 				a.obj(l).each(function(v,i){
-					if(a.obj.is(v)){
-						r.push(v);
-						return;
-					}
-					r.push(i+opt.wedge+v);
+					r.push(i+opt.wedge+(a.obj.is(v)? a.text.ify(v) : v));
 				});
 			}
 			return r;
@@ -175,29 +174,23 @@ theory=(function(b,c,fn){
 			if($=a.fns.$(this)){ ll=l;l=$ }
 			// yeaah, try again.
 		});
-		list.plop = (function(l,s){
-			if($=a.fns.$(this)){ s=l;l=$ }
-			for(var i = l.length-1; 0 <= i; i--){
-				if(l[i] == s){
-					return l.splice(i, 1);
-				}
-			}
-		});
-		list.find = (function(l,c,t){
-			if($=a.fns.$(this)){ t=c;c=l;l=$ }
-			return list._each(l,c,t);
-		});
-		list.each = (function(l,c,t){
-			if($=a.fns.$(this)){ t=c;c=l;l=$ }
-			return list._each(l,c,t);
-		});
-		list.crunch = (function(l,c,t){
-			if($=a.fns.$(this)){ t=c;c=l;l=$ }
-			return list._each(l,function(v,i,t){
-				if(!v){ return }
-				if(list.is(v) && !v.length){ return }
+		list.less = (function(l,s){
+			var args = a.list.slit.call(arguments, 0), sl = s, ls = l;
+			l = ($=a.fns.$(this))||l;
+			s = $? args : args.slice(1);
+			if($ === args.length){ l=ls;s=sl }
+			sl = s.length;
+			return a.list(l).each(function(v,i,t){
+				if(1 == sl && a.test(v).is(s[0])){ return } else
+				if(a.list(s).each(function(w,j){
+					if(a.test(v).is(w)){ return true }
+				})){ return }
 				t(v);
 			});
+		});
+		list.each = list.find = (function(l,c,t){
+			if($=a.fns.$(this)){ t=c;c=l;l=$ }
+			return list._each(l,c,t);
 		});
 		list.index = 1;
 		list._each = (function(){ // modified github.com/kriszyp/each to non-0 index & 0 !indexOf
@@ -257,7 +250,7 @@ theory=(function(b,c,fn){
 				}
 				// indexOf operation
 				for(i = thisObject || 0; i < length; i++){
-					if(array[i] === callback){
+					if(a.test(array[i]).is(callback)){
 						return (i+list.index);
 					}
 				}
@@ -621,17 +614,23 @@ theory=(function(b,c,fn){
 		}); /** END HELPERS **/
 		return com;
 	});
-	a.test = (function(b,c,fn){
-		try{return b()}catch(e){return e};
+	a.test = (function($){
+		var test = a.test;
+		test.nil = 'ThEoRy.TeSt.NiL-VaLuE'
+		a.log(test.name = 'test');
+		if(a.fns.is($)){ try{return $()}catch(e){return e} }
+		test.$ = arguments.length? $ : test.nil;$=null;
+		test._ = (function(r){ r = a.fns.$(this); test.$ = test.nil; return r; });
 		test.is = (function(a, b, aStack, bStack){ // via Underscore
+			if(($=test._()) !== test.nil){ b=a;a=$ }
 			var _ = {isFunction:function(obj){return typeof obj === 'function'}
-				,has:function(obj,key){return hasOwnProperty.call(obj,key)}};
+				,has:function(obj,key){return hasOwnProperty.call(obj,key)}}, eq = this.is;
 			aStack = aStack||[]; bStack = bStack||[];
 			// Identical objects are equal. `0 === -0`, but they aren't identical.
 			if(a === b){ return a !== 0 || 1 / a == 1 / b }
 			if(a == null || b == null){ return a === b }
-			var className = toString.call(a);
-			if(className != toString.call(b)){ return false }
+			var className = Object.prototype.toString.apply(a);
+			if(className != Object.prototype.toString.apply(b)){ return false }
 			switch(className){
 				case '[object String]': return a == String(b);
 				case '[object Number]': return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
@@ -671,7 +670,7 @@ theory=(function(b,c,fn){
 			return result;
 		});
 		return test;
-	});
+	});a.test();
 	return a;
 });theory(true);
 
@@ -730,7 +729,7 @@ theory=(function(b,c,fn){
 				a.onload=a.onreadystatechange=function(){if(/de|m/.test(a.readyState||"m")){c&&c();document.body.removeChild(a);try{for(c in a)delete a[c]}catch(b){}}};
 				a.src=b;z=function(){document.body?document.body.appendChild(a):s(z,1)};s(z,1)})};
 			window.module.ajax.code = util.execute;
-			window.JSON = window.JSON || false;
+			if(!window.JSON){ module.ajax.code('http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js',function(d){ }) }
 			window.onerror = (function(e,w,l){
 				console.log(e + " at line "+ l +" on "+ w);
 				//if(theory.com){ theory.com.send({e:e,url:w,line:l}) }
