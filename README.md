@@ -623,4 +623,4 @@ Time
 
         -   `a.time.stop(1111)` → `true`
 
-[[ .. to be continued ]]
+[[ ... to be continued ]]
