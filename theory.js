@@ -86,26 +86,13 @@ theory=(function(b,c,fn){
 			t.$=null;
 			return v;
 		});
-		fns.ids = 1;
-		fns.pass = (function(fn,context){ // from jQuery.proxy()
-			if (a.text.is(context)){
-				var tmp = a(fn,context);//fn[context];
-				context = fn;
-				fn = tmp;
-			}
-			// Quick check to determine if target is callable, in the spec
-			// this throws a TypeError, but we will just return null.
-			if (!fns.is(fn)) {
-				return null;
-			}
-			// Simulated bind
-			var args = a.list.slit.call(arguments,2),
-				proxy = function() {
-					return fn.apply(context,args.concat(a.list.slit.call(arguments)));
-				};
-			// Set the guid of unique handler to the same of original handler, so it can be removed
-			proxy.id = fn.id = fn.id || proxy.id || this.ids++;
-			return proxy;
+		fns.pass = (function(fn,o){
+			$ = this.$_;this.$_=null;if($){ o=fn;fn=$ }
+			if(a.text.is(o)){ var tmp = a(fn,o); o = fn; fn = tmp }
+			if(!fns.is(fn)){ return null }
+			return (function(){
+				return fn.apply(o, a.list.slit.call(arguments));
+			});
 		});
 		return fns;
 	});a.fns();
@@ -118,24 +105,22 @@ theory=(function(b,c,fn){
 			return (l instanceof Array)? true : false;
 		});
 		list.slit = Array.prototype.slice;
-		list.at = (function(l,i,fn){
-			if($=a.fns.$(this)){ i=l;l=$ }
+		list.at = (function(l,i,opt){
+			var r;
+			if($=a.fns.$(this)){ opt=i;i=l;l=$ }
 			if(!l||!i){ return undefined }
 			if(a.text.is(l)){ l = l.split('') }
 			if(i < 0){
-				l = l.slice().reverse();
+				r = l.slice().reverse();
 				i = Math.abs(i);
-			} if(a.fns.is(fn)){ return fn(l,i) }
-			return l[--i];
-		});
-		list.ebb = (function(l,i){
-			return list.at(l,i,function(r,i){
+			} opt = opt || {};
+			if(opt.ebb){
 				for(--i; 0 <= i; i--){	// upgrade to functionalize
 					if(r && r[i] !== undefined){ return r[i] }
 					else if(l[i] !== undefined){ return l[i] }
-				}
-				return undefined;
-			});
+				} return undefined;
+			}
+			return (r||l)[--i];
 		});
 		list.ify = (function(l,opt){
 			if($=a.fns.$(this)){ opt=l;l=$ }
@@ -190,73 +175,12 @@ theory=(function(b,c,fn){
 		});
 		list.each = list.find = (function(l,c,t){
 			if($=a.fns.$(this)){ t=c;c=l;l=$ }
-			return list._each(l,c,t);
+			return a.obj.each(l,c,t);
+		});
+		list.copy = (function(l){
+			return a.obj.copy( ($=a.fns.$(this))||l );
 		});
 		list.index = 1;
-		list._each = (function(){ // modified github.com/kriszyp/each to non-0 index & 0 !indexOf
-			var undefined;
-			function getEmit(result){
-				return function(newValue){
-					// emit function adds result to return array
-					result.push(newValue);
-				};
-			}
-			return function(array, callback, thisObject){
-				// create an emit function if there is enough arguments, otherwise avoid the allocation cost
-				var i = 0, result, emit, length = array.length;
-				if(typeof callback == "function"){
-					// standard each usage, calling a callback on each item
-					if(callback.length > 2){
-						emit = getEmit(result = []);
-					}
-					if(length > -1){
-						if(thisObject){
-							// iterate over array
-							for(;i < length; i++){
-								// call the callback
-								var newValue = callback.call(thisObject, array[i], (i+list.index), emit);
-								// if a value was returned, examine it
-								if(newValue !== undefined){
-									// defined value breaks out of loop
-									return newValue;
-								}
-							}
-						}else{
-							// we do a separate branch for when thisObject isn't provided because
-							// it is faster to avoid the .call()
-							for(;i < length; i++){
-								// call the callback
-								var newValue = callback(array[i], (i+list.index), emit);
-								// if a value was returned, examine it
-								if(newValue !== undefined){
-									// defined value breaks out of loop
-									return newValue;
-								}
-							}
-						}
-					}else{
-						// not an array, iterate over an object
-						for(i in array){
-							if(a.obj.has(array,i)){
-								var newValue = callback.call(thisObject, array[i], i, emit);
-							}
-							if(newValue !== undefined){
-								// defined value breaks out of loop
-								return newValue;
-							}
-						}  
-					}
-					return result;
-				}
-				// indexOf operation
-				for(i = thisObject || 0; i < length; i++){
-					if(a.test(array[i]).is(callback)){
-						return (i+list.index);
-					}
-				}
-				return (list.index)?0:-1;
-			};
-		})();
 		return list;
 	});a.list();
 	a.obj = (function($){
@@ -281,51 +205,103 @@ theory=(function(b,c,fn){
 				if(i){ return true }
 			})? false : true;
 		});
-		obj.copy = (function(o){
-			o = a.fns.$(this)||o;
-			var r = {};
-			a.obj.each(o,function(v,i,t){
-				r[i] = v;
+		obj.copy = (function(o,r,l){
+			if(!r){
+				o = a.fns.$(this) || o;
+			} l = a.list.is(o);
+			if(r && !a.obj.is(o) && !l){ return o } 
+			r = {}; o = a.obj.each(o,function(v,i,t){
+				l? t(obj.copy(v,true)) : (r[i] = obj.copy(v,true));
 			});
-			return r;
+			return l? o : r;
 		});
 		obj.union = obj.u = (function(x,y){
+			var args = a.list.slit.call(arguments, 0), r = {};
 			if($=a.fns.$(this)){ y=x;x=$ }
-			x = x||{}; y = y||{};
-			var o = {};
-			a.obj.each(x,function(v,i,t){
-				o[i] = v;
+			if(a.list.is(x)){ y = x } else
+			if(a.list.is(y)){ } else {
+				y = $? args : args.slice(1);
+				y.splice(0,0,x);
+			}
+			a.list(y).each(function(v,i){
+				a.obj(v).each(function(w,j){
+					if(a.obj(r).has(j)){ return }
+					r[j] = w;
+				});
 			});
-			a.obj.each(y,function(v,i,t){
-				o[i] = v;
-			});
-			return o;
-		});
-		obj.each = (function(o,c,t){
-			if($=a.fns.$(this)){ t=c;c=o;o=$ }
-			return a.list._each(o,c,t);
+			return r;
 		});
 		obj.has = (function(o,k){
 			if($=a.fns.$(this)){ k=o;o=$ }
 			return Object.prototype.hasOwnProperty.call(o, k);
 		});
-		obj.get = (function(o,l){
+		obj.each = (function(l,c,_){
+			if($=a.fns.$(this)){ _=c;c=l;l=$ }
+			var i = 0, ii = 0, x, r, rr, f = a.fns.is(c),
+			t = (function(k,v){
+				if(v !== undefined){
+					rr = rr || {};
+					rr[k] = v;
+					return;
+				} rr = rr || [];
+				rr.push(k);
+			});
+			if(a.list.is(l)){
+				x = l.length;
+				for(i; i < x; i++){
+					ii = (i + a.list.index);
+					if(f){
+						r = _? c.call(_, l[i], ii, t) : c(l[i], ii, t);
+						if(r !== undefined){ return r }
+					} else {
+						if(a.test(c).is(l[i])){ return ii }
+					}
+				}
+			} else if(a.obj.is(l)){
+				for(i in l){
+					if(f){
+						if(a.obj(l).has(i)){
+							r = _? c.call(_, l[i], i, t) : c(l[i], i, t);
+							if(r !== undefined){ return r }
+						}
+					} else {
+						if(a.test(c).is(l[i])){ return i }
+					}
+				}
+			}
+			return f? rr : a.list.index? 0 : -1;
+		});
+		obj.get = (function(o,l,opt,f){
 			if($=a.fns.$(this)){ l=o;o=$ }
 			if(a.num.is(l)){ l = a.text.ify(l) }
 			if(a.list.is(l)){ l = l.join('.') }
 			if(a.text.is(l)){
-				nf = (l.length == (l = l.replace(a.text.find.__.fn,'')).length);
-				l = (/\//g.test(l))? [l] : l.split(a.text.find.__.dot);
-			}
-			return a.list(l||[]).each(function(v,i){
-				if(!a.obj.has((o||{}),v)){ 
-					return nf? null : function(){};
-				} 
-				o = o[v];
-				if(l.length == i){
-					return nf? o : (a.fns.is(o)? o : function(){});
+				f = (l.length == (l = l.replace(a.text.find.__.fn,'')).length)? 
+				undefined : function(){}; l = l.split(a.text.find.__.dot);
+			} var x = l.length, r,
+			deep = (function(o,v){
+				return a.list(o).each(function(w,j){
+					if(a.obj(w||{}).has(v)){ return w }
+					if(a.list.is(w)){ return deep(w,v) }
+				});
+			}), get = (function(v,i,t,n){
+				if(a.list.is(o)){
+					if(/^\-?\d+$/.test(v)){
+						n = a.list.index;
+						v = a.num.ify(v);
+					} else {
+						o = deep(o,v);
+					}
 				}
-			});
+				if(n || a.obj(o||{}).has(v)){
+					o = n? a.list(o).at(v) : o[v];
+					if(i === x){
+						return f? a.fns.is(o)? o : f : o;
+					} return;
+				}
+				return f || a.test.nil;
+			}); r = a.list(l).each(get);
+			return r === a.test.nil? undefined : r;
 		});
 		return obj;
 	});a.obj();
@@ -394,7 +370,6 @@ theory=(function(b,c,fn){
 			n = (($=a.fns.$(this))!==null)?$:n;
 			return ( (n===0)? true : (!isNaN(n) && !a.bi.is(n) && !a.list.is(n) && !a.text.is(n))? true : false);
 		});
-		num.get = (function(i){ return });
 		num.i = (function(n){return parseInt(a.fns.$(this)||n,10)});
 		num.dec = (function(n){return parseFloat(a.fns.$(this)||n)});
 		num.ify = (function(n,o){
@@ -440,11 +415,13 @@ theory=(function(b,c,fn){
 		});
 		return bi;
 	});a.bi();
-	a.time = (function(){
-		var time = {};
+	a.time = (function($){
+		var time = a.time;
 		a.log(time.name = 'time');
+		time.$ = $ !== undefined? $ : null;$=null;
 		time.is = (function(t){
-			return (+new Date().getTime())
+			t = ($=a.fns.$(this))||t;
+			return t? t instanceof Date : (+new Date().getTime());
 		});
 		time.now = (function(){
 			return a.num.ify((a.time.is().toString())+a.num.r(4))
@@ -457,11 +434,12 @@ theory=(function(b,c,fn){
 			var args = a.fns.sort(a.list.slit.call(arguments, 0));
 			return (args.f.length)?setTimeout(a.list(args.f).at(1),a.list(args.n).at(1)):null;
 		});
-		time.clear = (function(i){
-			return clearTimeout(i);
+		time.stop = (function(i){
+			i = ($=a.fns.$(this))||i;
+			return (clearTimeout(i)&&clearInterval(i))||true;
 		});
 		return time;
-	})();
+	});a.time();
 	a.com = (function($){
 		var com = a.com;
 		a.log(com.name = 'com');
@@ -621,10 +599,10 @@ theory=(function(b,c,fn){
 		if(a.fns.is($)){ try{return $()}catch(e){return e} }
 		test.$ = arguments.length? $ : test.nil;$=null;
 		test._ = (function(r){ r = a.fns.$(this); test.$ = test.nil; return r; });
-		test.is = (function(a, b, aStack, bStack){ // via Underscore
+		test.is = (function(a, b, aStack, bStack){ // modified Underscore's to fix flaws
 			if(($=test._()) !== test.nil){ b=a;a=$ }
 			var _ = {isFunction:function(obj){return typeof obj === 'function'}
-				,has:function(obj,key){return hasOwnProperty.call(obj,key)}}, eq = this.is;
+				,has:function(obj,key){return hasOwnProperty.call(obj,key)}}, eq = test.is;
 			aStack = aStack||[]; bStack = bStack||[];
 			// Identical objects are equal. `0 === -0`, but they aren't identical.
 			if(a === b){ return a !== 0 || 1 / a == 1 / b }
@@ -634,6 +612,7 @@ theory=(function(b,c,fn){
 			switch(className){
 				case '[object String]': return a == String(b);
 				case '[object Number]': return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
+				case '[object Function]':  return a.name === b.name && a.toString() === b.toString();
 				case '[object Date]':
 				case '[object Boolean]': return +a == +b;
 				case '[object RegExp]': return a.source == b.source && a.global == b.global && 

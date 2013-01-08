@@ -6,11 +6,39 @@ Theory is an abstraction layer for server side and client side JavaScript.
 For some documentation, see the Coalesce framework for now, until I have time to
 write awesome docs here.
 
-Type Checking
-=============
+Binary
+======
+
+-   **is** `a.bi.is(what)`
+
+    -   determines to see if what is a boolean or not.
+
+    -   Examples
+
+        -   `a.bi.is(false)` → `true`
+
+        -   `a.bi.is(true)` → `true`
+
+        -   `a.bi.is(0)` → `false`
+
+        -   `a.bi.is('yes')` → `false`
 
 Numbers
 =======
+
+-   **is** `a.num.is(what)`
+
+    -   determines to see if what is a number or not.
+
+    -   Examples
+
+        -   `a.num.is(0)` → `true`
+
+        -   `a.num.is(NaN)` → `false`
+
+        -   `a.num.is(1.1)` → `true`
+
+        -   `a.num.is(Infinity)` → `true`
 
 -   **ify** `a.num.ify(what, opt)`
 
@@ -48,6 +76,18 @@ Numbers
 Text
 ====
 
+-   **is** `a.text.is(what)`
+
+    -   determines to see if what is text or not.
+
+    -   Examples
+
+        -   `a.text.is("")` → `true`
+
+        -   `a.text.is([])` → `false`
+
+        -   `a.text.is("Hello World!")` → `true`
+
 -   **ify** `a.text.ify(what)`
 
     -   what is the number, text, list, object, whatever you want to turn into
@@ -79,9 +119,9 @@ Text
 
     -   split is the text or regex to split and rejoin upon.
 
-    -   start is the start of the slice index.
+    -   start is the start position of the slice.
 
-    -   end is the end of the slice index.
+    -   end is the end position of the slice.
 
     -   Examples
 
@@ -95,7 +135,7 @@ Text
 
     -   Examples
 
-        -   `a.text.caps("shout!")` → `"SHOUT!"`
+        -   `a.text.caps("shout1")` → `"SHOUT1"`
 
 -   **low** `a.text.low(what)`
 
@@ -103,7 +143,7 @@ Text
 
     -   Examples
 
-        -   `a.text.low("HUSH 1")` → `"hush 1"`
+        -   `a.text.low("HUSH!")` → `"hush!"`
 
 -   **find** a collection of Regular Expressions.
 
@@ -112,6 +152,18 @@ Text
 
 Lists
 =====
+
+-   **is** `a.list.is(what)`
+
+    -   determines to see if what is a list or not.
+
+    -   Examples
+
+        -   `a.list.is([])` → `true`
+
+        -   `a.list.is("list")` → `false`
+
+        -   `a.list.is([0,false])` → `true`
 
 -   **ify** `a.list.ify(what, opt)`
 
@@ -137,11 +189,16 @@ Lists
 
         -   `a.list.ify("1,2,3 ; 4,5,6",{split:';'})` → `["1,2,3", "4,5,6"]`
 
--   **at** `a.list.at(what, index)`
+-   **at** `a.list.at(what, index, opt)`
 
     -   what is the list you want to access.
 
     -   index is the where in the list you want to retrieve the value.
+
+    -   opt is the options parameter.
+
+        -   ebb: causes an over reaching index to cascade till it finds the
+            closest item.
 
     -   Examples
 
@@ -149,20 +206,11 @@ Lists
 
         -   `a.list([5,6,7,8,9]).at(2)` → `6`
 
--   **ebb** `a.list.ebb(what, index)`
+        -   `a.list.at([2,3,4],9,{ebb:true})` → `4`
 
-    -   what is the list you want to access, similar to `at`, above.
+        -   `a.list([0,1,2]).at(-9,{ebb:true})` → `0`
 
-    -   index is where, but if you over reach, it will cascade till it finds the
-        closest item.
-
-    -   Examples
-
-        -   `a.list.ebb([2,3,4],9)` → `4`
-
-        -   `a.list([0,1,2]).ebb(-9)` → `0`
-
-        -   `a.list.ebb([5,6,7],-2)` → `6`
+        -   `a.list.at([5,6,7],-2,{ebb:true})` → `6`
 
 -   **fuse** `a.list.fuse(what, ...)`
 
@@ -174,7 +222,7 @@ Lists
 
         -   `a.list.fuse([2,3],[4,5],[6,7])` → `[2,3,4,5,6,7]`
 
-        -   `a.list([2,3]).fuse([4,5],[6,7])` → `[2,3,4,5,6,7]`
+        -   `a.list([2,3]).fuse([3,4],[4,5])` → `[2,3,3,4,4,5]`
 
 -   **less** `a.list.less(what, ...)`
 
@@ -259,13 +307,13 @@ Theory uses lists and index notation, not arrays and offset notation. Offset
 notation is the common practice of describing the position of an element in an
 array by its corresponding location in the physically allocated space of
 contiguous memory, which logically starts at a zeroth initial. This is otherwise
-shortened to “*0 based index arrays*”, despite the misnomer of it actually being
+shortened to "0 based index arrays", despite the misnomer of it actually being
 an offset. The author of this library has chosen index notation instead because
 it offers the following advantages:
 
 1.  Naturally, the first element in a list cardinally corresponds to `1`.
     Contrarily, even official documentation of JavaScript has explicit
-    disclaimers that the “*first element of an array is actually at index 0*” -
+    disclaimers that the "first element of an array is actually at index 0" -
     this is easily forgotten, especially by novices, and can lead to errors.
 
 2.  Mathematically, a closed interval is properly represented in code as `for(i
@@ -293,5 +341,284 @@ it offers the following advantages:
     one must decide upon whether `if( items.indexOf('z') == -1 ) return;` is
     philosophically more meaningful than `if( items.indexOf('z') < 0 ) return;`
     with offset notation despite ignoring the asymmetry of the equation.
+
+Objects
+=======
+
+-   **is** `a.obj.is(what)`
+
+    -   determines to see if what is an object or not.
+
+    -   Examples
+
+        -   `a.obj.is({})` → `true`
+
+        -   `a.obj.is(function(){})` → `false`
+
+        -   `a.obj.is([])` → `false`
+
+-   **ify** `a.obj.ify(what)`
+
+    -   what is the text-ified object you want to parse into an object.
+
+    -   *Note:* Essentially just a wrapper for `JSON.parse()` for now.
+
+    -   Examples
+
+        -   `a.obj.ify('[0,1]')` → `[0,1]`
+
+        -   `a.obj('{"a":false,"b":1,"c":"d","e":[0,1],"f":{"g":"h"}}').ify()` →
+            `{"a":false,"b":1,"c":"d","e":[0,1],"f":{"g":"h"}}`
+
+-   **has** `a.obj.has(what, key)`
+
+    -   what is the object you want to test the existence of a key or property
+        on.
+
+    -   key is the property you want to see if exists in what.
+
+    -   Examples
+
+        -   `a.obj.has({yay:false},'yay')` → `true`
+
+        -   `a.obj({yay:false}).has('toString')` → `false`
+
+-   **empty** `a.obj.empty(what)`
+
+    -   what is the object you want to test to see if it is empty.
+
+    -   Examples
+
+        -   `a.obj.empty({})` → `true`
+
+        -   `a.obj({a:0}).empty()` → `false`
+
+-   **copy** `a.obj.copy(what)`
+
+    -   what is the object or list that you want to make a deep duplicate of.
+
+    -   Examples
+
+        -   `a.obj.copy({a:[0,1],b:function(){ return 1 }})` →
+            `{a:[0,1],b:function(){ return 1 }}`
+
+        -   `a.obj([{a:1},{b:2}]).copy()` → `[{a:1},{b:2}]`
+
+-   **union** `a.obj.union(what, ...)`, `a.obj(what).u(...)`
+
+    -   what is the object you want to merge into, or a list of objects to
+        merge.
+
+    -   ... are more objects to be merged.
+
+    -   *Note:* You can provide a list of objects instead, which will be merged.
+
+    -   Examples
+
+        -   `a.obj.union({a:'b',c:'d'},{c:1,z:2})` → `{a:'b',c:'d',z:2}`
+
+        -   `a.obj([{a:1},{b:2}]).union()` → `{a:1,b:2}`
+
+        -   `a.obj({a:'b',c:'d'}).u({c:1,z:2},{x:3,y:4})` →
+            `{a:'b',c:'d',x:3,y:4,z:2}`
+
+        -   `a.obj.u([{a:1,b:2},{b:3,x:4},{y:5}])` → `{a:1,b:2,x:4,y:5}`
+
+-   **get** `a.obj.get(what, where)`
+
+    -   what is the object you want to get something from.
+
+    -   where is a dot separated text of keys to the thing you want to get.
+
+        -   numbers indicate a list index, if not specified it will scan through
+            the list.
+
+        -   "-\>" postfix indicates you will be calling a function, but if not
+            found it will return a fail safe function.
+
+    -   Examples
+
+        -   `a.obj.get({a:4,b:6,c:8},'b')` → `6`
+
+        -   `a.obj({a:4,b:6,c:8}).get('z')` → `undefined`
+
+        -   `a.obj({a:{z:{b:{y:{c:{x:'deep'}}}}}}).get('a.z.b.y.c.x')` →
+            `'deep'`
+
+        -   `a.obj({a:[1,[2,{b:{c:'scan'}},3],4]}).get('a.b.c')` → `'scan'`
+
+        -   `a.obj({a:[1,{b:'index'},3]}).get('a.2.b')` → `'index'`
+
+        -   `a.obj({a:[1,{b:'index'},3]}).get('a.-2.b')` → `'index'`
+
+        -   `a.obj({a:{b:function(c){return c*c}}}).get('a.b->')(2)` → `4`
+
+        -   `a.obj({a:1}).get('a.b->')(2)` → `undefined // fail safe`
+
+        -   `a.obj({a:1}).get('a.b')(2)` → `TypeError: undefined is not a
+            function`
+
+-   **each** `a.obj.each(object, function, this)`
+
+    -   object is the object you want to iterate through each of its key/value
+        pairs.
+
+    -   function is your callback which gets executed on each pair.
+
+        -   the first parameter is the current value.
+
+        -   the second parameter is the key of the value in the object.
+
+        -   the third parameter is a map function, which when called adds a
+            key/value pair to the object that is returned by default by `each`.
+
+        -   `return;` or `return undefined;` immediately proceeds to the next
+            pair.
+
+        -   return anything else and the loop breaks, then `each` returns the
+            value you returned instead.
+
+    -   this is an optional argument that will become the `this` inside the
+        function.
+
+    -   Examples
+
+        -   `a.obj({a:'z',b:'y'}).each(function(val, key, map){ map(val,key) })`
+            → `{y:'b',z:'a'}`
+
+        -   `a.obj({a:'z',b:'y'}).each(function(){ return "Hello World!"; })` →
+            `"Hello World!"`
+
+        -   `a.obj({a:1,b:2,c:3}).each(function(val, key, map){ if(val == 2){
+            return } map(key,val); })` → `{a:1,c:3}`
+
+        -   `a.obj({a:1,b:2,c:3}).each(function(val, key, map){ map(key,val);
+            if(val == 2){ return val } })` → `2`
+
+        -   `a.obj({z:4}).each(function(){ return this })` → `// current
+            context`
+
+        -   `a.obj({z:4}).each(function(){ return this }, [1,2])` → `[1,2]`
+
+Functions
+=========
+
+-   **is** `a.fns.is(what)`
+
+    -   determines to see if what is a function or not.
+
+    -   Examples
+
+        -   `a.fns.is(function(){})` → `true`
+
+        -   `a.fns.is({})` → `false`
+
+-   **pass** `a.fns.pass(function, this)`
+
+    -   function is the function that you want this bound to.
+
+    -   this will become the `this` inside the function.
+
+    -   *Note:* The original function is returned for you to then immediately
+        call.
+
+    -   Examples
+
+        -   `a.fns.pass(function(z){ return this.b + z  },{b:1})(2)` → `3`
+
+        -   `a.fns(function(z){ return this.b + z }).pass({b:2})`(3) → `5`
+
+-   **sort** `a.fns.sort(what)`
+
+    -   what is the arguments object of the function you want sorted.
+
+    -   *Note:* An object containing the first letter of each type is returned.
+        The value of these keys is a list with the corresponding arguments of
+        that type, in the same order as they appeared in the original function
+        call.
+
+    -   *Note:* If something goes wrong, an error type is included, with a text
+        value explaining why.
+
+    -   Examples
+
+        -   `(function(){ return a.fns.sort(arguments) })("a",0,"b",1,{z:2})` →
+            `{b:[],n:[0,1],t:['a','b'],l:[],o:[{z:2}],f:[]}`
+
+        -   `a.fns.sort()` → `{e:"Empty"}`
+
+-   **flow** `a.fns.flow(what, function)`
+
+    -   what is a sequential list of functions to asynchronously iterate
+        through.
+
+        -   the last parameter of each function is the next function in the
+            list.
+
+        -   at any point, the flow can be canceled by calling `.end()` on the
+            last parameter.
+
+    -   function is the callback to be executed at the end of the operations.
+
+    -   Examples
+
+        -   `a.fns.flow([function(next){ next(2) },function(two, next){
+            next.end(two * 3) },function(){ /* skipped */ }],function(six){
+            alert(six) })`
+
+Time
+====
+
+-   **is** `a.time.is()`
+
+    -   timestamp wrapper for `new Date().getTime()`, but if a parameter is
+        provided it will test if it is an instance of `Date`.
+
+    -   Examples
+
+        -   `a.time.is()` → `1357457565462`
+
+        -   `a.time(new Date()).is()` → `true`
+
+-   **now** `a.time.now()`
+
+    -   hyper precise timestamp, four digits longer than the above.
+
+    -   Examples
+
+        -   `a.time.now()` → `13574578667742920`
+
+-   **loop** `a.time.loop(function, interval)`
+
+    -   repeatedly calls function every interval millisecond, wrapper for
+        `setInterval`.
+
+    -   *Note:* Does not matter what order you call the parameters in.
+
+    -   Examples
+
+        -   `a.time.loop(function(){ alert('loop') },1000)` → `// returns ID for
+            clearing`
+
+-   **wait** `a.time.wait(function, delay)`
+
+    -   calls function after waiting millisecond delay, wrapper for
+        `setTimeout`.
+
+    -   *Note:* Does not matter what order you call the parameters in.
+
+    -   Examples
+
+        -   `a.time.wait(1000,function(){ alert('wait') })` → `// returns ID for
+            clearing`
+
+-   **stop** `a.time.stop(ID)`
+
+    -   stops the wait or loop associated with the ID from further being
+        executed.
+
+    -   Examples
+
+        -   `a.time.stop(1111)` → `true`
 
 [[ .. to be continued ]]
