@@ -526,7 +526,7 @@ Functions
 
         -   `a.fns.pass(function(z){ return this.b + z  },{b:1})(2)` → `3`
 
-        -   `a.fns(function(z){ return this.b + z }).pass({b:2})`(3) → `5`
+        -   `a.fns(function(z){ return this.b + z }).pass({b:2})(3)` → `5`
 
 -   **sort** `a.fns.sort(what)`
 
@@ -562,9 +562,9 @@ Functions
 
     -   Examples
 
-        -   `a.fns.flow([function(next){ next(2) },function(two, next){
-            next.end(two * 3) },function(){ /* skipped */ }],function(six){
-            alert(six) })`
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            a.fns.flow([function(next){ next(2) },function(two, next){ next.end(two \* 3) },function(){ /\* skipped \*/ }],function(six){ alert(six) })
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Time
 ====
