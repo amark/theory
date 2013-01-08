@@ -562,9 +562,11 @@ Functions
 
     -   Examples
 
-            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            a.fns.flow([function(next){ next(2) },function(two, next){ next.end(two \* 3) },function(){ /\* skipped \*/ }],function(six){ alert(six) })
-            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        -   `a.fns.flow([function(next){ next(2) },function(two, next){ next(two
+            * 3) }],function(six){ alert(six) })`
+
+        -   `a.fns.flow([function(next){ next.end(2) },function(){ /* skipped */
+            }],function(two){ alert(two) })`
 
 Time
 ====
