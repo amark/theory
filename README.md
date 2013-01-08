@@ -562,8 +562,8 @@ Functions
 
     -   Examples
 
-        -   `a.fns.flow([function(next){ next(2) },function(two, next){ next(two
-            * 3) }],function(six){ alert(six) })`
+        -   `a.fns.flow([function(next){ next(6) },function(six, next){ next(six
+            / 3) }],function(two){ alert(two) })`
 
         -   `a.fns.flow([function(next){ next.end(2) },function(){ /* skipped */
             }],function(two){ alert(two) })`
