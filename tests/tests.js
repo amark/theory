@@ -4,6 +4,7 @@ module.exports=require('theory')
 	var testsit = (function(z,x,y){
 		
 		state("theory.bi( TEST ).is()");
+		console.log("TEST: "+theory.bi(false).is());
 		tests("false", true, theory.bi(false).is());
 		tests("true", true, theory.bi(true).is());
 		tests("''", false, theory.bi('').is());
@@ -206,7 +207,9 @@ module.exports=require('theory')
 		
 		state("theory.num( TEST ) || .random( TEST ) || .r( TEST )");
 		tests("", 6, theory.num.r().toString().length);
-		tests("11", 11, theory.num.r(11).toString().length);
+		tests("11", 11, theory.num(11).r().toString().length);
+		tests("[10,99]", 2, theory.num.r([10,99]).toString().length);
+		tests("[-99,-10]", 3, theory.num([-99,-10]).r().toString().length);
 		
 		state("theory.text( TEST ) || .ify( TEST )");
 		tests("0", "0", theory.text(0).ify());
@@ -227,6 +230,10 @@ module.exports=require('theory')
 		tests("", 16, theory.text.r().length);
 		tests("11", 11, theory.text(11).random().length);
 		tests("4", 4, theory.text.r(4).length);
+		t.tr = theory.text.r(2,'as');tests("2,'as'", true, (t.tr=='as'||t.tr=='aa'||t.tr=='sa'||t.tr=='ss'));
+		t.tr = theory.text.random('as',2);tests("'as',2", true, (t.tr=='as'||t.tr=='aa'||t.tr=='sa'||t.tr=='ss'));
+		t.tr = theory.text(2).random('as');tests("2,'as'", true, (t.tr=='as'||t.tr=='aa'||t.tr=='sa'||t.tr=='ss'));
+		t.tr = theory.text('as').random(2);tests("'as',2", true, (t.tr=='as'||t.tr=='aa'||t.tr=='sa'||t.tr=='ss'));
 		
 		state("theory.text( TEST ) || .clip( TEST )");
 		tests('"A B C D"', 'A B C', theory.text('A B C D').clip(' ',0,-1));
@@ -364,29 +371,29 @@ module.exports=require('theory')
 		tests("{a:{b:{c:function(){return 1}}}}, 'a.b.c->'", function(){return 1}, theory.obj({a:{b:{c:function(){return 1}}}}).get('a.b.c->'));
 		tests("{a:{b:{c:function(){return 1}}}}, 'a.b.c->'", function(){return 1}, theory.obj.get({a:{b:{c:function(){return 1}}}},'a.b.c->'));
 		
-		state("theory.time( TEST ).is( TEST )")
-		tests("", true, (t.ts=theory.time.is()) && a.num.is(t.ts) && 13 <= t.ts.toString().length)
+		state("theory.time( TEST ).is( TEST )");
+		tests("", true, (t.ts=theory.time.is()) && theory.num.is(t.ts) && 13 <= t.ts.toString().length);
 		
-		state("theory.time( TEST ).now( TEST )")
-		tests("", true, (t.ts=theory.time.now()) && a.num.is(t.ts) && 17 <= t.ts.toString().length)
+		state("theory.time( TEST ).now( TEST )");
+		tests("", true, (t.ts=theory.time.now()) && theory.num.is(t.ts) && 17 <= t.ts.toString().length);
 		
-		state("theory.time.loop( TEST )")
-		tests("", true, (t.tl=theory.time.loop(function(){console.log('loop')},1000)) && a.num.is(t.tl))
+		state("theory.time.loop( TEST )");
+		tests("", true, (t.tl=theory.time.loop(function(){console.log('loop')},1000)) && (theory.num.is(t.tl) || a.obj.is(t.tl)));
 		
-		state("theory.time.wait( TEST )")
-		tests("", true, (t.tw=theory.time.wait(function(){console.log('wait')},1000)) && a.num.is(t.tw))
+		state("theory.time.wait( TEST )");
+		tests("", true, (t.tw=theory.time.wait(function(){console.log('wait')},1000)) && (theory.num.is(t.tw) || a.obj.is(t.tl)));
 		
-		state("theory.time( TEST ).stop( TEST )")
-		tests("", true, (theory.time.stop(t.tl) && theory.time.stop(t.tw)))
+		state("theory.time( TEST ).stop( TEST )");
+		tests("", true, (theory.time.stop(t.tl) && theory.time.stop(t.tw)));
 		
-		state("theory.fns.sort( TEST )")
-		tests("", {b:[true,false],n:[0,1],t:['','a'],l:[[],[2]],o:[{},{b:3}],f:[function(){}]}, theory.fns.sort([true,false,0,1,'','a',[],[2],{},{b:3},function(){}]))
+		state("theory.fns.sort( TEST )");
+		tests("", {b:[true,false],n:[0,1],t:['','a'],l:[[],[2]],o:[{},{b:3}],f:[function(){}]}, theory.fns.sort([true,false,0,1,'','a',[],[2],{},{b:3},function(){}]));
 		
-		state("theory.fns( TEST ).pass( TEST )")
+		state("theory.fns( TEST ).pass( TEST )");
 		tests("", 7, theory.fns(function(){ this.fp = 5; return this.fp +2; }).pass(t)());
 		tests("", 7, theory.fns.pass(function(){ this.fp = 5; return this.fp +2; },t)());
 		
-		state("theory.fns( TEST ).flow( TEST )")
+		state("theory.fns.flow( TEST )");
 		theory.fns.flow([
 			function(n){
 				n(t.ff = 5);
@@ -395,7 +402,7 @@ module.exports=require('theory')
 			}
 		],function(x){
 			t.ff = x*x;
-		});theory.time.wait(function(){tests("", 625, t.ff)},50);
+		});theory.time.wait(function(){tests("", 625, t.ff)},250);
 	});
 	var start = new Date().getTime(), t = {},
 	state = (function(s){

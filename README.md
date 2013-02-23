@@ -57,21 +57,25 @@ Numbers
 
         -   `a.num("My values are 33, -2.2, and 6.").ify([])` → `[33, -2.2, 6]`
 
--   **random** `a.num.random(length)`, `a.num.r(length)`
+-   **random** `a.num.random(what)`, `a.num.r(what)`
 
-    -   length is how many digits long you want your random number.
+    -   if what is a number, it represents how many digits long you want your
+        random number.
 
-    -   *Note:* Maximum is 14, defaults to 6.
+    -   if what is a list, it represents the inclusive range you want your
+        random number to be in.
+
+    -   *Note:* Maximum length is 14, what defaults to 6.
 
     -   Examples
 
         -   `a.num.random()` → `583587`
 
-        -   `a.num.r()` → `811452`
+        -   `a.num(2).r()` → `64`
 
-        -   `a.num(11).r()` → `72573435444`
+        -   `a.num([-10,10]).random()` → `-7`
 
-        -   `a.num(2).random()` → `91`
+        -   `a.num.r([1,99])` → `99`
 
 Text
 ====
@@ -100,18 +104,25 @@ Text
         -   `a.text.ify({a:0,b:'1',c:[0,'1'],d:{e:'f'}})` →
             `"{a:0,b:'1',c:[0,'1'],d:{e:'f'}}"`
 
--   **random** `a.text.random(length)`, `a.text.r(length)`
+-   **random** `a.text.random(what, length)`, `a.text.r(what, length)`
+
+    -   what is a text of allowed characters to be used. Defaults to
+        alpha-numeric characters.
 
     -   length is how many characters long you want your random text. Defaults
         to 16.
+
+    -   *Note:* Does not matter what order you call the parameters in.
 
     -   Examples
 
         -   `a.text.random()` → `"uTkphuTCmzQ7Pl3e"`
 
-        -   `a.text.r(4)` → `"XneV"`
+        -   `a.text.r("AaSsDdFf",4)` → `"fDds"`
 
-        -   `a.text(11).r()` → `"gbDVM9TyFRl"`
+        -   `a.text(4).random("j$k4")` → `"kj$k"`
+
+        -   `a.text("randomize").r()` → `"oadomneradnimarz"`
 
 -   **clip** `a.text(what).clip(split, start, end)`
 

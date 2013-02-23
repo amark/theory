@@ -1,5 +1,5 @@
 { "name": "theory"
-, "version": "0.2.2"
+, "version": "0.2.3"
 , "author": "Mark Nadal"
 , "description": "Abstraction layer for server side and client side JavaScript."
 , "homepage": "http://github.com/amark/theory"
