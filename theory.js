@@ -33,6 +33,10 @@ theory=(function(b,c,fn){
 				$ = this.$_;this.$_=_;fn = $||fn;
 				return (fn instanceof Function)? true : false;
 			});
+			fns.of = (function(t,f){
+				if(!f){ f = t; t = fns.$_ }
+				return t instanceof f;
+			});
 			fns.flow = (function(s,f){ // TODO: BUG: Seriously reconsider then().done() because they fail on .end() after a synchronous callback, provide no doc or support for it until you do.
 				var t = (function(){
 					var args = a.list.slit.call(arguments,0), n;
@@ -164,9 +168,9 @@ theory=(function(b,c,fn){
 				if($ === args.length){ l=ls;s=sl }
 				sl = s.length;
 				return a.list(l).each(function(v,i,t){
-					if(1 == sl && a.test(v).is(s[0])){ return } else
+					if(1 == sl && a.test.is(v,s[0])){ return } else
 					if(a.list(s).each(function(w,j){
-						if(a.test(v).is(w)){ return true }
+						if(a.test.is(v,w)){ return true }
 					})){ return }
 					t(v);
 				});
@@ -253,7 +257,7 @@ theory=(function(b,c,fn){
 							r = _? c.call(_, l[i], ii, t) : c(l[i], ii, t);
 							if(r !== undefined){ return r }
 						} else {
-							if(a.test(c).is(l[i])){ return ii }
+							if(a.test.is(c,l[i])){ return ii }
 						}
 					}
 				} else if(a.obj.is(l)){
@@ -264,7 +268,7 @@ theory=(function(b,c,fn){
 								if(r !== undefined){ return r }
 							}
 						} else {
-							if(a.test(c).is(l[i])){ return i }
+							if(a.test.is(c,l[i])){ return i }
 						}
 					}
 				}
@@ -526,8 +530,7 @@ theory=(function(b,c,fn){
 				var way = w||a.obj.get(m,'how.way')||com.way;
 				if($=a.fns.$(this)){
 					way = ($.charAt(0)=='.')?com.way+$:$;
-				}
-				return m = com.meta(m,way);
+				} return m = com.meta(m,way);
 			});
 			com.ask = (function(m,f){
 				if(!a.fns.is(f)){ return }
@@ -689,10 +692,10 @@ theory=(function(b,c,fn){
 				global.aname = global.aname||m.name;
 				cb = util.launch(m);
 				util.deps(args,function(j){
-					r = require((j.slice(0,2) == './')? module.rel + j.slice(1) : j);
-					if(r){
-						theory[(j=util.stripify(j))] = m.theory[j] = r;
-					}
+					var p = j; p = p.slice(0,3) == '../'? module.rel+'/'+p : p;
+					p = p.slice(0,2) == './'? module.rel + p.slice(1) : p;
+					r = require(p);
+					if(r){ theory[(j=util.stripify(j))] = m.theory[j] = r }
 				},m);
 				console.log(m.name+'!');
 				global.mods[m.name] = a.obj.ify(a.text.ify(m));
