@@ -335,7 +335,7 @@ it offers the following advantages:
     size - you can not access a fractional part of an element. Integer intervals
     are closed intervals, thus conclusively proving this importance.
 
-3.  Mathematically, matrix notation also starts with 1.
+3.  Mathematically, matrix notation also starts with `1`.
 
 4.  The last element in a list cardinally corresponds to the length of the list,
     thus allowing easy access with `items.length` rather than having frustrating

@@ -1,4 +1,4 @@
-/** THEORY **/ // ____________GOOD________________
+/** THEORY **/
 var theory=theory||null;if(theory){root.init()}else{
 theory=(function(b,c,fn){
 	function theory(b,c){
@@ -32,10 +32,6 @@ theory=(function(b,c,fn){
 			fns.is = (function(fn){
 				$ = this.$_;this.$_=_;fn = $||fn;
 				return (fn instanceof Function)? true : false;
-			});
-			fns.of = (function(t,f){
-				if(!f){ f = t; t = fns.$_ }
-				return t instanceof f;
 			});
 			fns.flow = (function(s,f){ // TODO: BUG: Seriously reconsider then().done() because they fail on .end() after a synchronous callback, provide no doc or support for it until you do.
 				var t = (function(){
@@ -455,10 +451,10 @@ theory=(function(b,c,fn){
 			theory.com.queue = theory.com.queue||[];
 			com.dc = [theory.time.now()];
 			com.node = (function(opt){
-				if(process.send){
-					process.on('message',function(m){
+				if(process.send && !process._events.theory){
+					process._events.theory = (function(m){
 						com.msg(a.obj.ify(m));
-					});
+					}); process.on('message',process._events.theory);
 					process.send({onOpen:{readyState:(process.readyState = 1)},mod:root.mods[opt.way]});
 					com.wire = process;
 					return;
@@ -597,13 +593,17 @@ theory=(function(b,c,fn){
 			}); /** END HELPERS **/
 			return com;
 		});
-		a.test = (function(){
+		a.test = (function(){ // TODO: BUG: NEED TESTS AND DOCS!
 			function test($){
-				if(a.fns.is($)){ try{return $()}catch(e){return e} }
+				if($===undefined && a.fns.is(test.$)){ try{return $()}catch(e){return e} }
 				test.$ = arguments.length? $ : test.nil;
 				return test;
 			} test.nil = test.$ = 'ThEoRy.TeSt.NiL-VaLuE';
 			test._ = (function(r){ r = a.fns.$(this); test.$ = test.nil; return r; });
+			test.of = (function(t,f){
+				if(($=test._()) !== test.nil){ f=t;t=$ }
+				return t instanceof f;
+			});
 			test.is = (function(a, b, aStack, bStack){ // modified Underscore's to fix flaws
 				if(($=test._()) !== test.nil){ b=a;a=$ }
 				var _ = {isFunction:function(obj){return typeof obj === 'function'}
