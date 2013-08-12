@@ -1,5 +1,5 @@
 /** THEORY **/
-var theory=theory||null;if(theory){root.init()}else{
+;var theory=theory||null;if(theory){root.init()}else{
 theory=(function(b,c,fn){
 	function theory(b,c){
 		var a = (function(b,c){
@@ -16,21 +16,20 @@ theory=(function(b,c,fn){
 		});
 		if(this && theory.bi.is(this)){ return theorize(a) }
 		return a(b,c);
-	}
+	} var $, _;
 	function theorize(a){
 		var $=undefined,_=undefined;
 		a.log = (function(s){
-			var log = {};
 			//console.log(s);
-			return log;
+			return a.log;
 		});
 		a.fns = (function(){
 			function fns($){
 				fns.$_ = $ !== undefined? $ : _;
 				return fns;
-			}
+			} var $;
 			fns.is = (function(fn){
-				$ = this.$_;this.$_=_;fn = $||fn;
+				$ = fns.$_;fns.$_=_;fn = $||fn;
 				return (fn instanceof Function)? true : false;
 			});
 			fns.flow = (function(s,f){ // TODO: BUG: Seriously reconsider then().done() because they fail on .end() after a synchronous callback, provide no doc or support for it until you do.
@@ -43,7 +42,7 @@ theory=(function(b,c,fn){
 					return t;
 				}), list = a.list.is(s)? s : a.list.is(f)? f : 0;
 				f = a.fns.is(f)? f : a.fns.is(s)? s : function(){};
-				t.end = list? f : function(){};
+				t.end = list? f : function(){}; // TODO: Receives `next` as param, is this desirable?
 				t.then = (function(fn){
 					if(a.fns.is(fn)){ t.list.push(fn) }
 					return t;
@@ -61,8 +60,8 @@ theory=(function(b,c,fn){
 			fns.sort = (function(args){
 				if(!args){ return {e:"Empty"} }
 				var args = a.list.slit.call(args, 0), r = {b:[],n:[],t:[],l:[],o:[],f:[]};
-				for(var i in args){ // TODO: use while loop on args directly, not array.
-					if (this.is(args[i])){
+				for(var i = 0; i < args.length; i++){
+					if (fns.is(args[i])){
 						r.f.push(args[i]);
 					} else if(a.list.is(args[i])){
 						r.l.push(args[i]);
@@ -84,7 +83,7 @@ theory=(function(b,c,fn){
 				return v;
 			});
 			fns.pass = (function(fn,o){
-				$ = this.$_;this.$_=_;if($){ o=fn;fn=$ }
+				$ = fns.$_;fns.$_=_;if($){ o=fn;fn=$ }
 				if(a.text.is(o)){ var tmp = a(fn,o); o = fn; fn = tmp }
 				if(!fns.is(fn)){ return _ }
 				return (function(){
@@ -97,15 +96,15 @@ theory=(function(b,c,fn){
 			function list($){
 				list.$ = $ !== undefined? $ : _;
 				return list;
-			}
+			} var $;
 			list.is = (function(l){
-				l = a.fns.$(this)||l;
+				l = a.fns.$(list)||l;
 				return (l instanceof Array)? true : false;
 			});
 			list.slit = Array.prototype.slice;
 			list.at = (function(l,i,opt){
 				var r;
-				if($=a.fns.$(this)){ opt=i;i=l;l=$ }
+				if($=a.fns.$(list)){ opt=i;i=l;l=$ }
 				if(!l||!i){ return undefined }
 				if(a.text.is(l)){ l = l.split('') }
 				if(i < 0){
@@ -121,7 +120,7 @@ theory=(function(b,c,fn){
 				return (r||l)[--i];
 			});
 			list.ify = (function(l,opt){
-				if($=a.fns.$(this)){ opt=l;l=$ }
+				if($=a.fns.$(list)){ opt=l;l=$ }
 				opt=opt||{};
 				opt.wedge = opt.wedge||':';
 				opt.split = opt.split||',';
@@ -142,24 +141,24 @@ theory=(function(b,c,fn){
 			});
 			list.fuse = (function(l){
 				var args = a.list.slit.call(arguments, 0), ll;
-				l = ($=a.fns.$(this))||l;
+				l = ($=a.fns.$(list))||l;
 				ll = $? a.fns.sort(args).l : a.fns.sort(args).l.slice(1);
 				return Array.prototype.concat.apply(l,ll);
 			});
 			list.union = list.u = (function(l,ll){ //[1,2,3,4,5] u [3,5,6,7,8] = [1,2,3,4,5,6,7,8]
 				return not_implemented_yet;
-				if($=a.fns.$(this)){ ll=l;l=$ }
+				if($=a.fns.$(list)){ ll=l;l=$ }
 				// yeaaah, try again.
 				return r;
 			});
 			list.intersect = list.n = (function(l,ll){ //[1,2,3,4,5] n [3,5,6,7,8] = [3,5]
 				return not_implemented_yet;
-				if($=a.fns.$(this)){ ll=l;l=$ }
+				if($=a.fns.$(list)){ ll=l;l=$ }
 				// yeaah, try again.
 			});
-			list.less = (function(l,s){
+			list.less = (function(l,s){ // ToDo: Add ability to use a function to determine what is removed.
 				var args = a.list.slit.call(arguments, 0), sl = s, ls = l;
-				l = ($=a.fns.$(this))||l;
+				l = ($=a.fns.$(list))||l;
 				s = $? args : args.slice(1);
 				if($ === args.length){ l=ls;s=sl }
 				sl = s.length;
@@ -172,11 +171,11 @@ theory=(function(b,c,fn){
 				});
 			});
 			list.each = list.find = (function(l,c,t){
-				if($=a.fns.$(this)){ t=c;c=l;l=$ }
+				if($=a.fns.$(list)){ t=c;c=l;l=$ }
 				return a.obj.each(l,c,t);
 			});
 			list.copy = (function(l){
-				return a.obj.copy( ($=a.fns.$(this))||l );
+				return a.obj.copy( ($=a.fns.$(list))||l );
 			});
 			list.index = 1;
 			return list;
@@ -185,13 +184,13 @@ theory=(function(b,c,fn){
 			function obj($){
 				obj.$ = $ !== undefined? $ : _;
 				return obj;
-			}
+			} var $;
 			obj.is = (function(o){
-				o = a.fns.$(this)||o;
+				o = a.fns.$(obj)||o;
 				return (o instanceof Object && !a.list.is(o) && !a.fns.is(o))? true : false;
 			});
 			obj.ify = (function(o){
-				o = a.fns.$(this)||o;
+				o = a.fns.$(obj)||o;
 				if(a.obj.is(o)){ return o }
 				try{
 					o = JSON.parse(o);
@@ -199,14 +198,14 @@ theory=(function(b,c,fn){
 				return o;
 			});
 			obj.empty = (function(o){
-				if(!(o = a.fns.$(this)||o)){ return true }
+				if(!(o = a.fns.$(obj)||o)){ return true }
 				return obj.each(o,function(v,i){
 					if(i){ return true }
 				})? false : true;
 			});
 			obj.copy = (function(o,r,l){
 				if(!r){
-					o = a.fns.$(this) || o;
+					o = a.fns.$(obj) || o;
 				} l = a.list.is(o);
 				if(r && !a.obj.is(o) && !l){ return o } 
 				r = {}; o = a.obj.each(o,function(v,i,t){
@@ -216,7 +215,7 @@ theory=(function(b,c,fn){
 			});
 			obj.union = obj.u = (function(x,y){
 				var args = a.list.slit.call(arguments, 0), r = {};
-				if($=a.fns.$(this)){ y=x;x=$ }
+				if($=a.fns.$(obj)){ y=x;x=$ }
 				if(a.list.is(x)){ y = x } else
 				if(a.list.is(y)){ } else {
 					y = $? args : args.slice(1);
@@ -231,11 +230,11 @@ theory=(function(b,c,fn){
 				return r;
 			});
 			obj.has = (function(o,k){
-				if($=a.fns.$(this)){ k=o;o=$ }
+				if($=a.fns.$(obj)){ k=o;o=$ }
 				return Object.prototype.hasOwnProperty.call(o, k);
 			});
 			obj.each = (function(l,c,_){
-				if($=a.fns.$(this)){ _=c;c=l;l=$ }
+				if($=a.fns.$(obj)){ _=c;c=l;l=$ }
 				var i = 0, ii = 0, x, r, rr, f = a.fns.is(c),
 				t = (function(k,v){
 					if(v !== undefined){
@@ -271,7 +270,7 @@ theory=(function(b,c,fn){
 				return f? rr : a.list.index? 0 : -1;
 			});
 			obj.get = (function(o,l,opt,f){
-				if($=a.fns.$(this)){ l=o;o=$ }
+				if($=a.fns.$(obj)){ l=o;o=$ }
 				if(a.num.is(l)){ l = a.text.ify(l) }
 				if(a.list.is(l)){ l = l.join('.') }
 				if(a.text.is(l)){
@@ -309,31 +308,31 @@ theory=(function(b,c,fn){
 			function text($){
 				text.$ = $ !== undefined? $ : _;
 				return text;
-			}
+			} var $;
 			text.is = (function(t){
-				t = (($=a.fns.$(this))!==_)?$:t;
+				t = (($=a.fns.$(text))!==_)?$:t;
 				return typeof t == 'string'?true:false;
 			});
 			text.get = (function(q){ return });
 			text.ify = (function(t){
-				t = (($=a.fns.$(this))!==_)?$:t;
+				t = (($=a.fns.$(text))!==_)?$:t;
 				if(JSON){ return JSON.stringify(t) }
 				return t.toString? t.toString():t;
 			});
 			text.random = text.r = (function(l,c){
-				if($=a.fns.$(this)){ c=l;l=$ } var $ = $||l, s = '';
+				if($=a.fns.$(text)){ c=l;l=$ } var $ = $||l, s = '';
 				l = a.num.is($)? $ : a.num.is(c)? c : 16;
 				c = a.text.is($)? $ : a.text.is(c)? c : '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
 				while(l>0){ s += c.charAt(Math.floor(Math.random()*c.length)); l-- }
 				return s;
 			});
 			text.clip = (function(t,r,s,e){
-				if($=a.fns.$(this)){ e=s;s=r;r=t;t=$ }
+				if($=a.fns.$(text)){ e=s;s=r;r=t;t=$ }
 				return (t||'').split(r).slice(s,e).join(r);
 			});
-			text.find = (function(_this){
+			text.find = (function(t){
 				var regex = {};
-				a.log(regex.name = _this.name+'.find');
+				a.log(regex.name = t.name+'.find');
 				regex.is = /[\.\\\?\*\[\]\{\}\(\)\^\$\+\|\,]/ig
 				regex.special = {'.':1,'\\':1,'?':1,'*':1,'[':1,']':1,'{':1,'}':1,'(':1,')':1,'^':1,'$':1,'+':1,'|':1,',':1}
 				regex.mail = /^(("[\w-\s]+")|([\w-]+(?:[\.\+][\w-]+)*)|("[\w-\s]+")([\w-]+(?:[\.\+][\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i;
@@ -350,12 +349,12 @@ theory=(function(b,c,fn){
 				return regex;
 			})(text);
 			text.caps = (function(t){
-				t = a.fns.$(this)||t;
+				t = a.fns.$(text)||t;
 				t = (text.is(t))?t:"";
 				return t.toUpperCase();
 			});
 			text.low = (function(t){
-				t = a.fns.$(this)||t;
+				t = a.fns.$(text)||t;
 				t = (text.is(t))?t:"";
 				return t.toLowerCase();
 			});
@@ -365,15 +364,15 @@ theory=(function(b,c,fn){
 			function num($){
 				num.$ = ($ !== undefined? $ : _);
 				return num;
-			}
+			} var $;
 			num.is = (function(n){
-				n = (($=a.fns.$(this))!==_)?$:n;
+				n = (($=a.fns.$(num))!==_)?$:n;
 				return ( (n===0)? true : (!isNaN(n) && !a.bi.is(n) && !a.list.is(n) && !a.text.is(n))? true : false);
 			});
-			num.i = (function(n){return parseInt(a.fns.$(this)||n,10)});
-			num.dec = (function(n){return parseFloat(a.fns.$(this)||n)});
+			num.i = (function(n){return parseInt(a.fns.$(num)||n,10)});
+			num.dec = (function(n){return parseFloat(a.fns.$(num)||n)});
 			num.ify = (function(n,o){
-				if(($=a.fns.$(this))!==_){ o=n;n=$ }
+				if(($=a.fns.$(num))!==_){ o=n;n=$ }
 				var r, l = a.list.is(o);
 				if(a.list.is(o)){
 					if(a.num.is(n)){
@@ -393,7 +392,7 @@ theory=(function(b,c,fn){
 				}
 			});
 			num.random = num.r = (function(l){
-				l = ((($=a.fns.$(this))!==_)?$:l)||6;
+				l = ((($=a.fns.$(num))!==_)?$:l)||6;
 				if(a.list.is(l)){ return (Math.floor(Math.random() * (l[1] - l[0] + 1)) + l[0]) }
 				l = (l<=14)? l : 14;
 				var n = '9';
@@ -410,12 +409,37 @@ theory=(function(b,c,fn){
 			function bi($){
 				bi.$ = $ !== undefined? $ : _;
 				return bi;
-			}
+			} var $;
 			bi.is = (function(b){
-				b = (($=a.fns.$(this))!==_)?$:b;
+				b = (($=a.fns.$(bi))!==_)?$:b;
 				return (b instanceof Boolean || typeof b == 'boolean')?true:false;
 			});
 			return bi;
+		})();
+		a.on = (function(){
+			function on($){
+				on.$ = $ !== undefined? $ : _;
+				return on;
+			} var $, events = {}, sort = (function(A,B){
+				if(!A || !B){ return 0 } A = A.i; B = B.i;
+				if(A < B){ return -1 }else if(A > B){ return 1 }
+				else { return 0 }
+			});
+			on.emit = (function(){
+				if(!a.text.is($ = a.fns.$(on))) return;
+				var e = events[$] = events[$] || (events[$] = []), args = arguments;
+				if(!(events[$] = a.list(e).each(function(hear, i, t){
+					if(!hear.fn) return; t(hear);
+					hear.fn.apply(hear, args);
+				}))){ delete events[$]; }
+			});
+			on.event = (function(fn, i){
+				if(!a.text.is($ = a.fns.$(on))) return;
+				var $ = events[$] = events[$] || (events[$] = [])
+				, e = {fn: fn, i: i || 0, off: function(){ return !(e.fn = false); }};
+				return $.push(e), $.sort(sort), e;
+			});
+			return on;
 		})();
 		a.time = (function(){
 			function time($){
@@ -423,11 +447,11 @@ theory=(function(b,c,fn){
 				return time;
 			}
 			time.is = (function(t){
-				t = ($=a.fns.$(this))||t;
+				t = ($=a.fns.$(time))||t;
 				return t? t instanceof Date : (+new Date().getTime());
 			});
 			time.now = (function(){
-				return a.num.ify((a.time.is().toString())+a.num.r(4))
+				return a.num.ify((a.time.is().toString())+'.'+a.num.r(4));
 			});
 			time.loop = (function(fn,d){
 				var args = a.fns.sort(a.list.slit.call(arguments, 0));
@@ -438,7 +462,7 @@ theory=(function(b,c,fn){
 				return (args.f.length)?setTimeout(a.list(args.f).at(1),a.list(args.n).at(1)):_;
 			});
 			time.stop = (function(i){
-				i = ($=a.fns.$(this))||i;
+				i = ($=a.fns.$(time))||i;
 				return (clearTimeout(i)&&clearInterval(i))||true;
 			});
 			return time;
@@ -486,7 +510,7 @@ theory=(function(b,c,fn){
 						theory.com.close&&theory.com.close(m);
 					};
 				});
-				if(com.off){ return }
+				if(theory.com.off){ return }
 				if(window.SockJS){
 					municate();
 				} else {
@@ -524,7 +548,7 @@ theory=(function(b,c,fn){
 			});
 			com.ways = (function(m,w){
 				var way = w||a.obj.get(m,'how.way')||com.way;
-				if($=a.fns.$(this)){
+				if($=a.fns.$(com)){
 					way = ($.charAt(0)=='.')?com.way+$:$;
 				} return m = com.meta(m,way);
 			});
@@ -599,7 +623,7 @@ theory=(function(b,c,fn){
 				test.$ = arguments.length? $ : test.nil;
 				return test;
 			} test.nil = test.$ = 'ThEoRy.TeSt.NiL-VaLuE';
-			test._ = (function(r){ r = a.fns.$(this); test.$ = test.nil; return r; });
+			test._ = (function(r){ r = a.fns.$(test); test.$ = test.nil; return r; });
 			test.of = (function(t,f){
 				if(($=test._()) !== test.nil){ f=t;t=$ }
 				return t instanceof f;
@@ -658,7 +682,7 @@ theory=(function(b,c,fn){
 		return a;
 	}
 	theory.name = 'theory';
-	theory.version = 2.3;
+	theory.version = 2.4;
 	theorize(theory);
 	return theory;
 })(true);
@@ -668,16 +692,14 @@ theory=(function(b,c,fn){
 **/
 (function(r){
 	var root = root||{}, a = theory;
-	root.sec = ['all'];
-	root.name = 'theory';
-	root.opts = {};
 	root.mods = {};
-	root.queue = {};
-	root.launch = {};
+	root.name = 'theory';
+	root.opts = root.opts || {};
+	root.deps = {loaded:{},alias:{},all:{}};
 	root.pollute = ((typeof GLOBAL !== 'undefined' && GLOBAL.global && GLOBAL.process &&
 					GLOBAL.process.env && GLOBAL.process.pid && GLOBAL.process.execPath)?
 		(function(){
-			global.node = true;
+			global.node = root.node = true;
 			global.theory = theory;
 			process.env.totheory = __filename;
 			global.name = root.name;
@@ -686,20 +708,16 @@ theory=(function(b,c,fn){
 			module.rel = require('path').dirname((module.parent||{}).filename);
 			module.exports=(function(cb,deps,name){
 				var args = a.fns.sort(a.list.slit.call(arguments, 0)), r
-					,m = util.mod(args);
-				root.queue[m.name=util.stripify(m.name)] = util.stripify(m.name);
-				global.a = m.theory = util.theorize(m);
+					,m = util.require.apply({},arguments);
 				global.aname = global.aname||m.name;
-				cb = util.launch(m);
-				util.deps(args,function(j){
-					var p = j; p = p.slice(0,3) == '../'? module.rel+'/'+p : p;
-					p = p.slice(0,2) == './'? module.rel + p.slice(1) : p;
-					r = require(p);
-					if(r){ theory[(j=util.stripify(j))] = m.theory[j] = r }
-				},m);
-				console.log(m.name+'!');
+				a.obj(util.deps(m.dependencies,{flat:{}})).each(function(name,path){
+					var p = path.slice(0,3) === '../'? module.rel +'/'+path : path;
+					p = require(p.slice(0,2) === './'? module.rel + p.slice(1) : p);
+					m.theory[name] = (theory.obj.is(p) && theory.obj.empty(p))? undefined : p;
+				});
+				//console.log(m.name+'!');
 				global.mods[m.name] = a.obj.ify(a.text.ify(m));
-				var mod = (theory[m.name] = global.a[m.name] = cb(m.theory));
+				var mod = (theory[m.name] = m.init(m.theory));
 				if(global.aname === m.name && theory.com) theory.com(root.name).init(m.name);
 				return mod;
 			});
@@ -710,244 +728,173 @@ theory=(function(b,c,fn){
 			window.console = window.console||{log:function(s){return s}};
 			console.saw = (function(s){console.log(a.text(s).ify())});
 			window.__dirname = '';
-			window.exports = {};
-			window.module = {exports: window.exports};
+			window.module = {exports: (window.exports = {})};
 			window.module.ajax = {load:// modified cross browser async javascript loader via http://johannburkard.tumblr.com/post/3053844418
 				(function(b,c){var d=document,f="script",a=d.createElement(f),e=2166136261,g=b.length,h=c,i=/=\?/,d=d.body,s=window.setTimeout,z,x; // TODO: BUG: does not work when at top of page!
 				z=function(x,a){(document.body&&x&&a)?document.body[x](a):s(z,1)};if(i.test(b)){for(;g--;)e=e*16777619^b.charCodeAt(g);window[f+=e<0?-e:e]=function(){
 				h.apply(h,arguments);delete window[f]};b=b.replace(i,"="+f);c=0}a.onload=a.onreadystatechange=function(){if(/de|m/.test(a.readyState||"m")){
 				c&&c();z('removeChild',a);try{for(c in a)delete a[c]}catch(b){}}};a.src=b;z('appendChild',a);})};
-			window.module.ajax.code = util.execute;
+			window.module.ajax.code = util.load;
 			window.onerror = (function(e,w,l){
 				console.log(e + " at line "+ l +" on "+ w);
 				//if(theory.com){ theory.com.send({e:e,url:w,line:l}) }
 			});
-			util.init();
 			root.who = root.who||a.list((document.cookie+';').match(/tid=(.+?);/)||[]).at(-1)||'';
+			util.init();
 			if(theory.com){ theory.com(root.name).init() }
 			if(!window.JSON){ module.ajax.code("//ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js",function(d){ }) }
-			window.require = (function(p){
-				var _require = require;
-				_require.resolve = (function(){
-				
-				});
-				_require.cache = _require.cache||{};
-				if(!p){ return _require } 
+			window.require = function require(p){
+				if(!p){ return require }
 				if(util.stripify(p) == util.stripify(root.name)){
-					return (function(n,cb,deps){
-						return util.async(deps,cb,n);
-					});
-				} if(_require.cache[p] || window[p]){
-					console.log(p+' already cached');
-					return _require.cache[p];
-				}
-				return window.module.ajax.code(p,function(d){ }) ||
-					(function(n,cb,deps){
-						return util.async(deps,cb,n);
-					});
-			});
-			require();
+					return util.require;
+				} var fn, c = 0, cb = function(f){ fn = f; };
+				a.list(p = theory.list.is(p)? p : [p]).each(function(v){
+					window.module.ajax.code(v,function(d){c++ && c == p.length && fn && fn(d)});
+				});
+				return cb;
+			}; require.resolve = (function(){}); require.cache = {};
 		})
 	);
-	var util = (function(){
-		var _this = {};
-		_this.pathify = (function(p){ return p = (/\.js$/i.test(p))? p : p+'.js'; });
-		_this.stripify = (function(p){
-			if(!a.text.is(p)){ return '' }
-			p=p.replace(/^\./,'');
-			return (p.split('/').reverse()[0]).replace(/\.js$/i,'');
-		});
-		_this.mod = (function(args){
-			if(!a.obj.is(args)){
-				return {name:'fail',init:(function(){console.log('module failed to load')})};
-			}
-			if(args.l.length){
-				var ao = a.list(args.l).at(1);
-				if(ao.name){ return ao }
-			}
-			if(args.o.length){
-				var ao = a.list(args.o).at(1);
-				if(ao.name){ return ao }
-			}
+	var util = {};	
+	util.theorize = (function(mod){
+		mod.theory = theory.call(true);
+		if(mod.theory.com){ mod.theory.com(mod.name) }
+		return mod.theory;
+	});
+	util.require = (function(){
+		var mod, args = a.fns.sort(a.list.slit.call(arguments,0))
+		, fail = {name:'fail',init:(function(){console.log('module failed to load')})};
+		if(args.o.length === 1 && !args.t.length && !args.l.length){
+			mod = a.list(args.o).at(1);
+		} else {
 			if(args.f.length){
-				return {
+				mod = {
 					name: a.list(args.t).at(1)
 					,init: a.list(args.f).at(1)
-					,dependencies: a.list(args.l).at(1)
+					,dependencies: a.list(args.l).at(1) || a.list(args.o).at(1)
 				}
 			}
-		});
-		_this.launch = (function(m,i){ // TODO: BUG: path to module in init.
-			root.launch[m.name] = true;
-			a.obj(root.queue).each(function(v,i){
-				root.queue[i] = a.list(v).each(function(w,j,t){
-					if(m.name != w.name){
-						t(w);
-					}
-				});
-				// TODO: BUG: Quazi-solved. Needs tests. Handle file names with '.' or other punctuations and post-fix, such as "jquery.ui.min".
-				if(!(root.queue[i]||[]).length){
-					delete root.queue[i];
-				}
-			});
-			return m.init||m.main||m.start||m.boot||m.cb||m.fn||(function(){console.log('module failed to load')});
-		});
-		_this.sandbox = (function(s,n){
-			try{ // via jQuery
-				(window.execScript || function(s){
-					window["eval"].call(window, s);
-				})(s);
-			}catch(e){
-				console.log("sandbox fail: "+n);
-				console.log(e);
-			}
-		});
-		_this.theorycount = 0;
-		_this.init = (function(){
-			if(!root.page){ return }
-			var s = document.getElementsByTagName('script'),
-			t = a.list(s).each(function(v,i,t){
-				if(v.id || !v.innerHTML || util.stripify(v.src) 
-				!== util.stripify(root.name)){ return }
-				return v;
-			});
-			if(t){
-				window.require = window.module.ajax.code;
-				util.sandbox(t.innerHTML,'Theory Configuration');
-				t.id = "theory"+util.theorycount++;
-			}
-		});
-		_this.exequeue = {};
-		_this.execute = (function(p,m,o,fn){
-			if(util.stripify(p) == util.stripify(root.name)){
-				return (function(n,cb,deps){
-					return util.async(deps,cb,n);
-				});
-			}
-			var args = a.fns.sort(a.list.slit.call(arguments,0));
-			p = a.list(args.t).at(1);
-			fn = a.list(args.f).at(1);
-			m = a.list(args.o).at(1)||{theory:{}};
-			console.log("loading " + p);
-			var init = (function(p,o,d){
-				if(module.clear){
-					module.exports = exports = {};
-					module.clear = false;
-				} else {
-					module.exports = (theory.obj.empty(exports))? module.exports : exports;
-				}
-				if(!root.launch[(p=util.stripify(p))]){
-					if(theory.fns.is(module.exports)){
-						theory[p] = m.theory[p] = module.exports();
-					} else {
-						theory[p] = m.theory[p] = module.exports||{};
-					}
-				}
-				module.exports = exports = {};
-				util.drain(p,o,m);
-				if(theory.fns.is(fn)){ fn(d) }
-				if(theory.fns.is(util.exequeue[p])){ util.exequeue[p](d) }
-				return theory[p];
-			});
-			try{window.module.ajax.load(util.pathify(p),function(d){
-				console.log(p +' loaded');
-				return init(p,o,d);
-			});module.exports = exports = {}}catch(e){
-				console.log("Network error.");
-			};
-			return (function(cb){
-				util.exequeue[util.stripify(p)] = cb;
-			});
-		});
-		_this.deps = (function(args,fn,mod){
-			var deps = {};
-			if(args.t.length){
-			}
-			if(args.l.length){
-				var ao = mod||a.list(args.l).at(1);
-				deps = ao.dependencies||ao.require||ao.deps||ao.dep;
-			}
-			if(args.o.length){
-				var ao = mod||a.list(args.o).at(1);
-				deps = ao.dependencies||ao.require||ao.deps||ao.dep;
-			}
-			(ao||mod).dependencies = deps;
-			a.list(deps).each(function(v,i){
-				if(a.list.is(deps)){
-					i = v;
-				} else {
-					v = {v:v};
-				}
-				fn(i,v);
-			});
-			return deps;
-		});
-		_this.theorize = (function(m){
-			m.theory = theory.call(true);
-			if(m.theory.com){ m.theory.com(m.name) }
-			return m.theory;
-		});
-		_this.async = (function(deps,cb){
-			var b = true, i, l = [], mod
-				,args = a.fns.sort(a.list.slit.call(arguments,0))
-				,m = util.mod(args);
-			m.theory = util.theorize(m);
-			deps = _this.deps(args,function(j,o){
-				i = util.stripify(j);
-				if(!root.launch[i]){
-					if(!root.queue[i]){
-						_this.execute(j,m,o);
-					}
-					(root.queue[i] = root.queue[i] || []).push(m);
-					b = false;
-				} else {
-					m.theory[i] = theory[i];
-				}
-			},m);
-			if(b){
-				cb = util.launch(m);
-				theory[m.name] = cb(m.theory||theory);
-				util.drain(m.name);
-				module.clear = m.name;
-				return theory[m.name];
-			}
-		});
-		_this.drain = (function(p,o,m){
-			var b = true, l = true, d, cb;
-			d = root.queue[p];
-			if(d&&a.list.is(d)){
-				d = d.slice().reverse();
+		}
+		mod.name = mod.name||fail.name;
+		mod.init = mod.init||mod.main||mod.start||mod.boot||mod.cb||mod.fn||fail.init;
+		mod.dependencies = mod.dependencies||mod.require||mod.deps||mod.dep;
+		mod.theory = util.theorize(mod);
+		if(root.node){ return mod }
+		args = {cb:function(p, opt){
+			if(args.launched 
+			|| a.list(util.deps(mod.dependencies,{flat:{}})).each(function(v,i){
+				if(!(i = root.deps.loaded[i])){ return true }
+				if(i === 2){ return true }
+				if(i && i.launch && mod.theory[v] === undefined){ mod.theory[v] = i.launch }
+			})){ return }
+			args.on.off();
+			args.launched = {launch: (theory[mod.name] = mod.init(mod.theory||theory))};
+			module.exports = exports = args.launched.launch;
+			if(mod.src){
+				root.deps.loaded[mod.src] = args.launched;
+				theory.on('ThEoRy_DePs').emit();
+			} return args.launched.launch;	
+		}};
+		args.on = theory.on('ThEoRy_DePs').event(args.cb);
+		root.deps.start? args.whoami = theory.on('ThEoRy_WhOaMi?').event(function(url){
+			if(!url){ return }
+			args.whoami.off();
+			root.deps.alias[mod.src = url] = mod.name;
+			if(args.launched){		
+				root.deps.loaded[url] = args.launched;
+				return theory.on('ThEoRy_DePs').emit();
+			} root.deps.all[url] = mod.dependencies;
+			root.deps.loaded[url] = 2;
+		}) : root.deps.start = true;
+		util.deps(mod.dependencies,args);
+		return args.cb();
+	});
+	util.deps = (function(deps, opt){
+		opt = opt || {};
+		var list = a.list.is(deps);
+		a.obj(deps).each(function(v,i){
+			var path, dopt = {cb: opt.cb};
+			if(list){
+				path = v;
 			} else {
-				d = [];
-			}
-			a.obj(root.queue).each(function(v,i){
-				a.list(v).each(function(w,j){
-					if(p === w.name){
-						return l = false;
-					}
-				});
-			});
-			if(l){
-				root.launch[p] = true;
-			}
-			a.list(d).each(function(v,i){
-				b = true;
-				if(l && v.theory){ v.theory[p] = theory[p] }
-				a.list(v.dependencies).each(function(w,j){
-					if(!root.launch[(j=util.stripify(a.list.is(v.dependencies)?w:j))]){
-						return b = false;
-					}
-					v.theory[j] = theory[j];
-				});
-				if(b && !root.launch[v.name]){
-					cb = util.launch(v,i);
-					theory[v.name] = cb(v.theory);
-					_this.drain(v.name);
+				path = i;
+				if(a.list.is(v) || a.obj.is(v)){
+					dopt.defer = v;
+					opt.flat && util.deps(v,{flat: opt.flat});
+				} if(v && a.text.is(v)){
+					dopt.name = v;
 				}
-			});
+			} if(opt.flat){
+				var url = util.urlify(util.pathify(path));
+				if((i = opt.flat[url]) && i !== 1){ return }
+				opt.flat[url] = (opt.sub? 1 : dopt.name) || util.stripify(path);
+				if(i !== 1 && url && a.text.is(url) && (v = root.deps.all[url])){
+					(a.obj.is(v) || a.list.is(v)) && util.deps(v,{flat: opt.flat, sub:1});
+				} return;
+			} util.load(path, dopt);
 		});
-		return _this;
-	})();
+		return opt.flat;
+	});
+	util.urlify = (function(url){ // via SO, IE6+ safe
+		if(!root.page){ return url; }
+		var el= document.createElement('div');
+		el.innerHTML= '<a href="'+url+'">x</a>';
+		return el.firstChild.href;
+	});
+	util.pathify = (function(p){ 
+		if(!root.page){ return p; }
+		return p = (/\.js$/i.test(p))? p : p+'.js'; 
+	});
+	util.stripify = (function(p){
+		if(!a.text.is(p)){ return ''; } p=p.replace(/^\./,'');
+		return (p.split('/').reverse()[0]).replace(/\.js$/i,'');
+	});
+	util.load = (function(p, opt){
+		if(util.stripify(p) == util.stripify(root.name)){
+			return util.require;
+		} opt = opt || {};
+		var path = util.pathify(p), url = util.urlify(path)
+		,	cb = (function(d){
+			if(false !== d){ 
+				console.log(path +' loaded');
+				root.deps.loaded[url] = 1;
+				(theory.fns.is(opt) && opt(d)||1) && theory.on('ThEoRy_WhOaMi?').emit(url, d);
+			}
+			opt.cb && opt.cb(p, opt);
+			opt.defer && util.deps(opt.defer, opt);
+		}); if(root.deps.loaded[url] 
+		|| root.deps.loaded[url] === 0){ 
+			return cb(false); 
+		} root.deps.loaded[url] = 0;
+		try{window.module.ajax.load(path,cb);}
+		catch(e){console.log("Network error.")};
+		console.log('loading', path);
+	});	
+	util.sandbox = (function(s,n){
+		try{ // via jQuery
+			(window.execScript || function(s){
+				window["eval"].call(window, s);
+			})(s);
+		}catch(e){
+			console.log("sandbox fail: "+n);
+			console.log(e, s);
+		}
+	});
+	util.theorycount = 0;
+	util.init = (function(r){
+		if(!root.page){ return }
+		var s = document.getElementsByTagName('script'),
+		t = a.list(s).each(function(v,i,t){
+			if(v.id || !v.innerHTML || util.stripify(v.src) 
+			!== util.stripify(root.name)){ return }
+			return v;
+		});
+		if(t){
+			window.require = window.module.ajax.code;
+			util.sandbox(t.innerHTML,'Theory Configuration');
+			t.id = "theory"+util.theorycount++;
+		}
+	});
 	root.init = (function(){
 		root.pollute();
 		return util.init;
