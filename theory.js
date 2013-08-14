@@ -168,7 +168,7 @@ theory=(function(b,c,fn){
 						if(a.test.is(v,w)){ return true }
 					})){ return }
 					t(v);
-				});
+				})||[];
 			});
 			list.each = list.find = (function(l,c,t){
 				if($=a.fns.$(list)){ t=c;c=l;l=$ }
@@ -246,7 +246,7 @@ theory=(function(b,c,fn){
 				});
 				if(a.list.is(l)){
 					x = l.length;
-					for(i; i < x; i++){
+					for(;i < x; i++){
 						ii = (i + a.list.index);
 						if(f){
 							r = _? c.call(_, l[i], ii, t) : c(l[i], ii, t);
@@ -327,8 +327,8 @@ theory=(function(b,c,fn){
 				return s;
 			});
 			text.clip = (function(t,r,s,e){
-				if($=a.fns.$(text)){ e=s;s=r;r=t;t=$ }
-				return (t||'').split(r).slice(s,e).join(r);
+				if($=a.fns.$(text)){ e=s;s=r;r=t;t=$ } // IE6 fails if e === undefined with Mocha
+				return t = (t||'').split(r), t=a.num.is(e)?t.slice(s,e):t.slice(s), t.join(r);
 			});
 			text.find = (function(t){
 				var regex = {};
@@ -416,7 +416,7 @@ theory=(function(b,c,fn){
 			});
 			return bi;
 		})();
-		a.on = (function(){
+		a.on = (function(){ // TODO: BUG: NEED DOCS!
 			function on($){
 				on.$ = $ !== undefined? $ : _;
 				return on;
@@ -514,9 +514,8 @@ theory=(function(b,c,fn){
 				if(window.SockJS){
 					municate();
 				} else {
-					module.ajax.code(com.url||'//cdn.sockjs.org/sockjs-0.3.min.js',function(d){
-						municate();
-					});
+					module.ajax.load(com.url||(location.local+'//cdn.sockjs.org/sockjs-0.3.min.js')
+					,function(d){municate()});
 				}
 			});
 			com.drain = (function(){
@@ -617,7 +616,7 @@ theory=(function(b,c,fn){
 			}); /** END HELPERS **/
 			return com;
 		});
-		a.test = (function(){ // TODO: BUG: NEED TESTS AND DOCS!
+		a.test = (function(){ // TODO: BUG: NEED DOCS!
 			function test($){
 				if($===undefined && a.fns.is(test.$)){ try{return $()}catch(e){return e} }
 				test.$ = arguments.length? $ : test.nil;
@@ -630,8 +629,8 @@ theory=(function(b,c,fn){
 			});
 			test.is = (function(a, b, aStack, bStack){ // modified Underscore's to fix flaws
 				if(($=test._()) !== test.nil){ b=a;a=$ }
-				var _ = {isFunction:function(obj){return typeof obj === 'function'}
-					,has:function(obj,key){return hasOwnProperty.call(obj,key)}}, eq = test.is;
+				var _ = {isFunction:theory.fns.is
+					,has:theory.obj.has}, eq = test.is;
 				aStack = aStack||[]; bStack = bStack||[];
 				// Identical objects are equal. `0 === -0`, but they aren't identical.
 				if(a === b){ return a !== 0 || 1 / a == 1 / b }
@@ -695,7 +694,7 @@ theory=(function(b,c,fn){
 	root.mods = {};
 	root.name = 'theory';
 	root.opts = root.opts || {};
-	root.deps = {loaded:{},alias:{},all:{}};
+	root.deps = {loaded:{},alias:{},all:{},now:[]};
 	root.pollute = ((typeof GLOBAL !== 'undefined' && GLOBAL.global && GLOBAL.process &&
 					GLOBAL.process.env && GLOBAL.process.pid && GLOBAL.process.execPath)?
 		(function(){
@@ -705,17 +704,16 @@ theory=(function(b,c,fn){
 			global.name = root.name;
 			global.mods = global.mods||{};
 			if(process.env.NODE_ENV==='production'){process.env.LIVE = true};
-			module.rel = require('path').dirname((module.parent||{}).filename);
+			module.path = require('path');
 			module.exports=(function(cb,deps,name){
 				var args = a.fns.sort(a.list.slit.call(arguments, 0)), r
 					,m = util.require.apply({},arguments);
+				args.file = root.submodule||(module.parent||{}).filename;
 				global.aname = global.aname||m.name;
-				a.obj(util.deps(m.dependencies,{flat:{}})).each(function(name,path){
-					var p = path.slice(0,3) === '../'? module.rel +'/'+path : path;
-					p = require(p.slice(0,2) === './'? module.rel + p.slice(1) : p);
+				a.obj(util.deps(m.dependencies,{flat:{},src:args.file})).each(function(name,path){
+					var p = require(root.submodule=path);
 					m.theory[name] = (theory.obj.is(p) && theory.obj.empty(p))? undefined : p;
 				});
-				//console.log(m.name+'!');
 				global.mods[m.name] = a.obj.ify(a.text.ify(m));
 				var mod = (theory[m.name] = m.init(m.theory));
 				if(global.aname === m.name && theory.com) theory.com(root.name).init(m.name);
@@ -727,32 +725,36 @@ theory=(function(b,c,fn){
 			window.root = root;
 			window.console = window.console||{log:function(s){return s}};
 			console.saw = (function(s){console.log(a.text(s).ify())});
+			location.local=(location.protocol==='file:'?'http:':'');
 			window.__dirname = '';
 			window.module = {exports: (window.exports = {})};
-			window.module.ajax = {load:// modified cross browser async javascript loader via http://johannburkard.tumblr.com/post/3053844418
-				(function(b,c){var d=document,f="script",a=d.createElement(f),e=2166136261,g=b.length,h=c,i=/=\?/,d=d.body,s=window.setTimeout,z,x; // TODO: BUG: does not work when at top of page!
-				z=function(x,a){(document.body&&x&&a)?document.body[x](a):s(z,1)};if(i.test(b)){for(;g--;)e=e*16777619^b.charCodeAt(g);window[f+=e<0?-e:e]=function(){
-				h.apply(h,arguments);delete window[f]};b=b.replace(i,"="+f);c=0}a.onload=a.onreadystatechange=function(){if(/de|m/.test(a.readyState||"m")){
-				c&&c();z('removeChild',a);try{for(c in a)delete a[c]}catch(b){}}};a.src=b;z('appendChild',a);})};
+			window.module.ajax = {load:(function(b,c){ // modified cross browser async javascript loader via http://johannburkard.tumblr.com/post/3053844418
+				var d=document,j="script",s=d.createElement(j),e=2166136261
+				,g=b.length,h=c,i=/=\?/,w=window.setTimeout,x,y,a=function(z){
+					document.body&&(z=z||x)&&s?document.body[y=z](s):w(a,0);
+				};if(i.test(b)){for(;g--;)e=e*16777619^b.charCodeAt(g);
+					window[j+=e<0?-e:e]=function(){h.apply(h,arguments);delete window[j]};b=b.replace(i,"="+j);c=0
+				};s.onload=s.onreadystatechange=function(){if(y&&/de|m/.test(s.readyState||"m")){
+					c&&c();a(x='removeChild');try{for(c in s)delete s[c]}catch(b){}
+				}};s.src=b;a(x='appendChild');
+			})};
 			window.module.ajax.code = util.load;
 			window.onerror = (function(e,w,l){
 				console.log(e + " at line "+ l +" on "+ w);
 				//if(theory.com){ theory.com.send({e:e,url:w,line:l}) }
 			});
-			root.who = root.who||a.list((document.cookie+';').match(/tid=(.+?);/)||[]).at(-1)||'';
-			util.init();
-			if(theory.com){ theory.com(root.name).init() }
-			if(!window.JSON){ module.ajax.code("//ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js",function(d){ }) }
-			window.require = function require(p){
+			window.require = module.require = function require(p){
 				if(!p){ return require }
 				if(util.stripify(p) == util.stripify(root.name)){
 					return util.require;
 				} var fn, c = 0, cb = function(f){ fn = f; };
-				a.list(p = theory.list.is(p)? p : [p]).each(function(v){
-					window.module.ajax.code(v,function(d){c++ && c == p.length && fn && fn(d)});
-				});
-				return cb;
-			}; require.resolve = (function(){}); require.cache = {};
+				theory.list((p = theory.list.is(p)? p : [p])).each(function(v){
+					window.module.ajax.code(v,function(d){++c && (p.length <= c) && fn && fn(d)});
+				}); return cb;
+			}; require.resolve = util.resolve; require.cache = {};
+			util.init();
+			root.who = root.who||a.list((document.cookie+';').match(/tid=(.+?);/)||[]).at(-1)||'';
+			if(theory.com){ theory.com(root.name).init() }
 		})
 	);
 	var util = {};	
@@ -774,56 +776,59 @@ theory=(function(b,c,fn){
 					,dependencies: a.list(args.l).at(1) || a.list(args.o).at(1)
 				}
 			}
-		}
-		mod.name = mod.name||fail.name;
+		} mod.name = mod.name||fail.name;
 		mod.init = mod.init||mod.main||mod.start||mod.boot||mod.cb||mod.fn||fail.init;
 		mod.dependencies = mod.dependencies||mod.require||mod.deps||mod.dep;
+		mod.dependencies = a.list.is(mod.dependencies)? 
+			a.list(mod.dependencies).each(function(v,i,t){t(v,1)}) : mod.dependencies;
 		mod.theory = util.theorize(mod);
 		if(root.node){ return mod }
 		args = {cb:function(p, opt){
 			if(args.launched 
-			|| a.list(util.deps(mod.dependencies,{flat:{}})).each(function(v,i){
-				if(!(i = root.deps.loaded[i])){ return true }
+			|| a.list(util.deps(mod.dependencies,{flat:{}})).each(function(v,j){
+				if(!(i = root.deps.loaded[j])){ 
+					module.sync && !module.on && a.time.wait(function(){util.load(j)},1);
+					return true 
+				}
 				if(i === 2){ return true }
-				if(i && i.launch && mod.theory[v] === undefined){ mod.theory[v] = i.launch }
+				if(i && i.launch && a.text.is(v) && mod.theory[v] === undefined){ mod.theory[v] = i.launch; }
 			})){ return }
 			args.on.off();
-			args.launched = {launch: (theory[mod.name] = mod.init(mod.theory||theory))};
+			args.launched = {launch: (theory[mod.name] = mod.init(mod.theory||theory)), n:mod.name};
 			module.exports = exports = args.launched.launch;
 			if(mod.src){
 				root.deps.loaded[mod.src] = args.launched;
 				theory.on('ThEoRy_DePs').emit();
 			} return args.launched.launch;	
-		}};
-		args.on = theory.on('ThEoRy_DePs').event(args.cb);
-		root.deps.start? args.whoami = theory.on('ThEoRy_WhOaMi?').event(function(url){
-			if(!url){ return }
-			args.whoami.off();
-			root.deps.alias[mod.src = url] = mod.name;
-			if(args.launched){		
-				root.deps.loaded[url] = args.launched;
-				return theory.on('ThEoRy_DePs').emit();
-			} root.deps.all[url] = mod.dependencies;
-			root.deps.loaded[url] = 2;
-		}) : root.deps.start = true;
-		util.deps(mod.dependencies,args);
-		return args.cb();
+		}}; args.on = theory.on('ThEoRy_DePs').event(args.cb);
+		(root.deps.now = root.deps.now||[]).push(mod.name);
+		args.start = function(){util.deps(mod.dependencies,args); return args.cb()}
+		args.name = function(src ,b){
+			module.on = args.name = false;
+			root.deps.now = theory.list(root.deps.now).less(mod.name);
+			root.deps.alias[args.src = mod.src = src] = mod.name;
+			if((root.deps.all[src] = mod.dependencies)){
+				root.deps.loaded[src] = 2;
+			} if(!window.JSON){module.ajax.load(root.opts.JSON||location.local // JSON shim when needed
+				+"//ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js",args.start)
+			} else { return args.start() };
+		}; module.on = (module.on === undefined)? args.name(util.src(1))||false : args.name;
 	});
 	util.deps = (function(deps, opt){
 		opt = opt || {};
-		var list = a.list.is(deps);
 		a.obj(deps).each(function(v,i){
-			var path, dopt = {cb: opt.cb};
-			if(list){
-				path = v;
-			} else {
-				path = i;
-				if(a.list.is(v) || a.obj.is(v)){
-					dopt.defer = v;
-					opt.flat && util.deps(v,{flat: opt.flat});
-				} if(v && a.text.is(v)){
-					dopt.name = v;
-				}
+			var path = i, dopt = {p:i};
+			if(opt.src){
+				delete deps[i];
+				deps[path = util.resolve(opt.src, util.pathify(path))] = v;
+			} if(a.list.is(v)){
+				delete deps[i];
+				v = deps[path] = a.list(v).each(function(w,i,t){t(util.resolve(opt.src,util.pathify(w)),1)})
+			} if(a.obj.is(v)){
+				dopt.defer = v;
+				opt.flat && util.deps(v,{flat: opt.flat});
+			} if(v && a.text.is(v)){
+				dopt.name = v;
 			} if(opt.flat){
 				var url = util.urlify(util.pathify(path));
 				if((i = opt.flat[url]) && i !== 1){ return }
@@ -831,7 +836,7 @@ theory=(function(b,c,fn){
 				if(i !== 1 && url && a.text.is(url) && (v = root.deps.all[url])){
 					(a.obj.is(v) || a.list.is(v)) && util.deps(v,{flat: opt.flat, sub:1});
 				} return;
-			} util.load(path, dopt);
+			} return util.load(path, dopt);
 		});
 		return opt.flat;
 	});
@@ -841,7 +846,7 @@ theory=(function(b,c,fn){
 		el.innerHTML= '<a href="'+url+'">x</a>';
 		return el.firstChild.href;
 	});
-	util.pathify = (function(p){ 
+	util.pathify = (function(p){
 		if(!root.page){ return p; }
 		return p = (/\.js$/i.test(p))? p : p+'.js'; 
 	});
@@ -849,26 +854,38 @@ theory=(function(b,c,fn){
 		if(!a.text.is(p)){ return ''; } p=p.replace(/^\./,'');
 		return (p.split('/').reverse()[0]).replace(/\.js$/i,'');
 	});
+	util.resolve = (function(p1, p2){ // via browserify
+		if('.' != p2.charAt(0)){ return p2 }
+		var path = p1.split('/'), segs = p2.split('/');
+		path.pop();
+		for(var i=0;i<segs.length;i++){
+			var seg = segs[i];
+			if('..' == seg){ path.pop() }
+			else if('.' != seg){ path.push(seg) }
+		} return path.join('/');
+	});
 	util.load = (function(p, opt){
 		if(util.stripify(p) == util.stripify(root.name)){
 			return util.require;
 		} opt = opt || {};
-		var path = util.pathify(p), url = util.urlify(path)
-		,	cb = (function(d){
-			if(false !== d){ 
-				console.log(path +' loaded');
+		if(root.deps.now.length){
+			module.sync = 1; return;
+		} var path = util.pathify(p), url = util.urlify(path)
+		, cb = (function(d){
+			if(false !== d){
+				console.log(opt.p||p, ' loaded');
 				root.deps.loaded[url] = 1;
-				(theory.fns.is(opt) && opt(d)||1) && theory.on('ThEoRy_WhOaMi?').emit(url, d);
-			}
-			opt.cb && opt.cb(p, opt);
-			opt.defer && util.deps(opt.defer, opt);
+				module.on && module.on(url);
+				theory.fns.is(opt) && opt(d);
+			} theory.on('ThEoRy_DePs').emit();
+			!module.sync && (opt.def||opt.defer) && util.deps(opt.defer, opt);
 		}); if(root.deps.loaded[url] 
-		|| root.deps.loaded[url] === 0){ 
+		|| root.deps.loaded[url] === 0){
 			return cb(false); 
 		} root.deps.loaded[url] = 0;
 		try{window.module.ajax.load(path,cb);}
 		catch(e){console.log("Network error.")};
-		console.log('loading', path);
+		console.log('loading', opt.p||p);
 	});	
 	util.sandbox = (function(s,n){
 		try{ // via jQuery
@@ -881,19 +898,23 @@ theory=(function(b,c,fn){
 		}
 	});
 	util.theorycount = 0;
+	util.src = (function(){
+		var s = document.getElementsByTagName('script');
+		return (s[s.length-1]||{}).src;
+	});
 	util.init = (function(r){
 		if(!root.page){ return }
-		var s = document.getElementsByTagName('script'),
-		t = a.list(s).each(function(v,i,t){
+		var z='', s = document.getElementsByTagName('script'), t;
+		for(var i in s){var v = s[i]; // IE6 fails on each, use for instead
+			r = v.src||r;
 			if(v.id || !v.innerHTML || util.stripify(v.src) 
-			!== util.stripify(root.name)){ return }
-			return v;
-		});
-		if(t){
-			window.require = window.module.ajax.code;
+			!== util.stripify(root.name)){ false;
+			} else { t = v }
+		} if(t){
 			util.sandbox(t.innerHTML,'Theory Configuration');
 			t.id = "theory"+util.theorycount++;
 		}
+		return r;
 	});
 	root.init = (function(){
 		root.pollute();

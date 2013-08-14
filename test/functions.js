@@ -4,6 +4,9 @@ module.exports=require('theory')
 		return Func;
 	}
 	describe('Functions',function(){
+		beforeEach(function(done){ // IE6 stack release
+			setTimeout(done, 0);
+		});
 		it('is()',function(){
 			expect(theory.fns(function(){}).is()).to.be(true);
 			expect(theory.fns('').is()).to.be(false);

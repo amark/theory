@@ -1,5 +1,6 @@
 module.exports=require('theory')
 ('syllabus',function(a){
+	//alert('arrays');
 	describe('arrays',function(){
 		it('deps',function(){
 			expect(root.ArrayIs).to.be(true);
@@ -7,4 +8,4 @@ module.exports=require('theory')
 		});
 	});
 	return [1,2,3];
-},['./array_is','./array_util']);
+},['./array_util', './array_is']);

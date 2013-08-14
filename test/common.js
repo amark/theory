@@ -1,6 +1,6 @@
 module.exports=require('theory')
 ('tests',function(a){
-	var s='',i;for(i in a){s+=i+', '};console.log(s);
+	var s='',i;for(i in a){s+=i+', '};console.log(s);//alert(s);
 	describe('Dependencies',function(){
 		it('are',function(){
 			expect(a.binary).to.be(true);
@@ -40,10 +40,27 @@ module.exports=require('theory')
 			expect(theory.test(0).is(-0)).to.not.be.ok();
 			expect(theory.test(-0).is(0)).to.not.be.ok();
 		});
+	});	
+	describe('Require',function(){
+		it('callback',function(){
+			if(root.node){
+				return expect('use native require').to.ok();
+			}
+			require(['./sub/three','./sub/four'])(function(){
+				expect(root.Three).to.be(3);
+				expect(root.Four).to.be(4);
+				require('./ready')(function(){
+					expect(root.Ready).to.be.ok();
+				});
+			});
+		});
 	});
-	if(root.page) mocha.run();
+	if(root.page){
+		mocha.run();
+	}
 },{
-	'./binary':''
+	'./sub/sub':''
+	,'./binary':''
 	,'./numbers':'count'
 	,'./strings':'texts'
 	,'./arrays':'enumerate'

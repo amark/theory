@@ -1,5 +1,6 @@
 module.exports=require('theory')
 ('hash',function(a){
+	//var s='',i;for(i in a){s+=i+', '};alert('hash: '+s);
 	describe('Objects',function(){
 		it('deps',function(){
 			expect(a.object_is).to.be(undefined);
@@ -12,7 +13,7 @@ module.exports=require('theory')
 	});
 	return {all:'your',tests:'belong',to:'us'};
 },{
-	'./object_is':''
-	,'./object_util':'util'
-	,'./object_get':'get'
+	'./sub/object_is':''
+	,'./sub/object_util':'util'
+	,'./sub/object_get':'get'
 });

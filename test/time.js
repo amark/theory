@@ -24,4 +24,4 @@ describe('Time',function(){
 		},57);
 	});
 });
-root.TimeFull = true;
+root.TimeFull = 'Time Travel';

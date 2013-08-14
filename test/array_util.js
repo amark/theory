@@ -1,6 +1,10 @@
 module.exports=require('theory')
 ('list_utils',function(a){
+	//alert('arrays util');
 	describe('arrays',function(){
+		beforeEach(function(done){ // IE6 stack release
+			setTimeout(done, 0);
+		});
 		it('at',function(){
 			expect(theory.list([1,2,3,4,5,6,7,8,9]).at(2)).to.be(2);
 			expect(theory.list.at([1,2,3,4,5,6,7,8,9],2)).to.be(2);
@@ -36,6 +40,10 @@ module.exports=require('theory')
 			expect(theory.list.fuse([2,3],[4,5],[6,7])).to.eql([2,3,4,5,6,7]);
 		});
 		it('less',function(){
+			expect(theory.list([1]).less(1)).to.eql([]);
+			expect(theory.list.less([1],1)).to.eql([]);
+			expect(theory.list([4,5]).less(1)).to.eql([4,5]);
+			expect(theory.list.less([4,5],1)).to.eql([4,5]);
 			expect(theory.list([0,1,'a','b','c','b','d']).less('b')).to.eql([0,1,'a','c','d']);
 			expect(theory.list.less([0,1,'a','b','c','b','d'],'b')).to.eql([0,1,'a','c','d']);
 			expect(theory.list([0,1,NaN,'','c',false,true,[1],[]]).less(NaN,false,0,[],'')).to.eql([1,'c',true,[1]]);
