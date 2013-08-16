@@ -61,8 +61,8 @@ instead of an array (`{'./needed': 'foo', './dependency': 'bar'}` become `a.foo`
 and `a.bar`). Theory modules also attach to their own namespace, such as
 `theory.hello` in above.
 
-Finally, you can also specify sub dependencies, in the case where you need
-`{'./jquery':['./jquery-ui','./jquery-ext']}` to align external files.
+You can also specify sub dependencies, such as `{'./jquery':['./jquery-ui',
+'./jquery-ext']}`.
 
 *Now let's dive into the API.*
 
