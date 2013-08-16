@@ -19,7 +19,7 @@ Motivation
 3.  **Universal normalization**. Write once, run everywhere. This dream gets
     broken when you discover different implementations of JavaScript behave in
     unique ways, whether browsers or phones and tablets, or IE6 versus server
-    side. I needed reliable yet tiny library (at **7KB** gzipped) that would
+    side. I needed a reliable yet tiny library (at **7KB** gzipped) that would
     normalize everything so any code written would literally work everywhere.
 
 Require
