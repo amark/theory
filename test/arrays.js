@@ -1,6 +1,5 @@
 module.exports=require('theory')
 ('syllabus',function(a){
-	//alert('arrays');
 	describe('arrays',function(){
 		it('deps',function(){
 			expect(root.ArrayIs).to.be(true);

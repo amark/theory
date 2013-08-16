@@ -416,7 +416,7 @@ theory=(function(b,c,fn){
 			});
 			return bi;
 		})();
-		a.on = (function(){ // TODO: BUG: NEED DOCS!
+		a.on = (function(){
 			function on($){
 				on.$ = $ !== undefined? $ : _;
 				return on;
@@ -479,7 +479,7 @@ theory=(function(b,c,fn){
 					process._events.theory = (function(m){
 						com.msg(a.obj.ify(m));
 					}); process.on('message',process._events.theory);
-					process.send({onOpen:{readyState:(process.readyState = 1)},mod:root.mods[opt.way]});
+					process.send({onOpen:{readyState:(process.readyState = 1)},mod:module.theory[opt.way]});
 					com.wire = process;
 					return;
 				}
@@ -616,9 +616,9 @@ theory=(function(b,c,fn){
 			}); /** END HELPERS **/
 			return com;
 		});
-		a.test = (function(){ // TODO: BUG: NEED DOCS!
+		a.test = (function(){
 			function test($){
-				if($===undefined && a.fns.is(test.$)){ try{return $()}catch(e){return e} }
+				if($===undefined && a.fns.is(test.$)){ try{return test.$()}catch(e){return e} }
 				test.$ = arguments.length? $ : test.nil;
 				return test;
 			} test.nil = test.$ = 'ThEoRy.TeSt.NiL-VaLuE';
@@ -691,8 +691,6 @@ theory=(function(b,c,fn){
 **/
 (function(r){
 	var root = root||{}, a = theory;
-	root.mods = {};
-	root.name = 'theory';
 	root.opts = root.opts || {};
 	root.deps = {loaded:{},alias:{},all:{},now:[]};
 	root.pollute = ((typeof GLOBAL !== 'undefined' && GLOBAL.global && GLOBAL.process &&
@@ -700,9 +698,8 @@ theory=(function(b,c,fn){
 		(function(){
 			global.node = root.node = true;
 			global.theory = theory;
+			module.theory = module.theory||{}
 			process.env.totheory = __filename;
-			global.name = root.name;
-			global.mods = global.mods||{};
 			if(process.env.NODE_ENV==='production'){process.env.LIVE = true};
 			module.path = require('path');
 			module.exports=(function(cb,deps,name){
@@ -714,9 +711,9 @@ theory=(function(b,c,fn){
 					var p = require(root.submodule=path);
 					m.theory[name] = (theory.obj.is(p) && theory.obj.empty(p))? undefined : p;
 				});
-				global.mods[m.name] = a.obj.ify(a.text.ify(m));
+				module.theory[m.name] = a.obj.ify(a.text.ify(m));
 				var mod = (theory[m.name] = m.init(m.theory));
-				if(global.aname === m.name && theory.com) theory.com(root.name).init(m.name);
+				if(global.aname === m.name && theory.com) theory.com(theory.name).init(m.name);
 				return mod;
 			});
 			return;
@@ -745,7 +742,7 @@ theory=(function(b,c,fn){
 			});
 			window.require = module.require = function require(p){
 				if(!p){ return require }
-				if(util.stripify(p) == util.stripify(root.name)){
+				if(util.stripify(p) == util.stripify(theory.name)){
 					return util.require;
 				} var fn, c = 0, cb = function(f){ fn = f; };
 				theory.list((p = theory.list.is(p)? p : [p])).each(function(v){
@@ -754,7 +751,7 @@ theory=(function(b,c,fn){
 			}; require.resolve = util.resolve; require.cache = {};
 			util.init();
 			root.who = root.who||a.list((document.cookie+';').match(/tid=(.+?);/)||[]).at(-1)||'';
-			if(theory.com){ theory.com(root.name).init() }
+			if(theory.com){ theory.com(theory.name).init() }
 		})
 	);
 	var util = {};	
@@ -865,7 +862,7 @@ theory=(function(b,c,fn){
 		} return path.join('/');
 	});
 	util.load = (function(p, opt){
-		if(util.stripify(p) == util.stripify(root.name)){
+		if(util.stripify(p) == util.stripify(theory.name)){
 			return util.require;
 		} opt = opt || {};
 		if(root.deps.now.length){
@@ -908,7 +905,7 @@ theory=(function(b,c,fn){
 		for(var i in s){var v = s[i]; // IE6 fails on each, use for instead
 			r = v.src||r;
 			if(v.id || !v.innerHTML || util.stripify(v.src) 
-			!== util.stripify(root.name)){ false;
+			!== util.stripify(theory.name)){ false;
 			} else { t = v }
 		} if(t){
 			util.sandbox(t.innerHTML,'Theory Configuration');

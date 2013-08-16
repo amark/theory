@@ -1,6 +1,6 @@
 module.exports=require('theory')
 ('tests',function(a){
-	var s='',i;for(i in a){s+=i+', '};console.log(s);//alert(s);
+	var s='',i;for(i in a){s+=i+', '};console.log(s);
 	describe('Dependencies',function(){
 		it('are',function(){
 			expect(a.binary).to.be(true);
@@ -18,6 +18,12 @@ module.exports=require('theory')
 	});
 	describe('Test',function(){
 		it('equality',function(){
+			(function(){
+				expect(theory.test(function(){ return 1; })()).to.be(1);
+				var e = theory.test(function(){ explode })().toString();
+				e = (e === "ReferenceError: explode is not defined" || e === "[object Error]");
+				expect(e).to.be.ok();
+			})();
 			expect(theory.test(function(){ return 'testing'; }).is(function(){ return 'testing'; })).to.be.ok();
 			expect(theory.test(NaN).is(NaN)).to.be.ok();
 			expect(theory.test(null).is(null)).to.be.ok();

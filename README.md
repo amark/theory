@@ -3,8 +3,65 @@ Theory
 
 Theory is an abstraction layer for server side and client side JavaScript.
 
-For some documentation, see the Coalesce framework for now, until I have time to
-write awesome docs here.
+Motivation
+==========
+
+1.  **Deep existence**. It all started because a program would crash via
+    `if(obj.x.y.z)` rather than `if(obj && obj.x && obj.x.y && obj.x.y.z)`, so I
+    wanted an elegant way to check and access deeply nested objects in a safe
+    yet concise manner.
+
+2.  **Dependency management**. You should not have to declare dependencies in
+    another language (HTML) to import required code or rely on globals. Other
+    tools that solve this foolishly break Node's style in order to make it work
+    asynchronously.
+
+3.  **Universal normalization**. Write once, run everywhere. This dream gets
+    broken when you discover different implementations of JavaScript behave in
+    unique ways, whether browsers or phones and tablets, or IE6 versus server
+    side. I needed reliable yet tiny library (**7KB** gzipped) that would
+    normalize everything so any code written would literally work everywhere.
+
+Require
+=======
+
+As simple as `npm install theory` on Node and a single `<script
+src='./theory.js'></script>` client side. The brilliant thing is that you do not
+have to declare anything else after that, you can handle the rest within your
+module.
+
+	module.exports=require('theory')
+	('hello', function(a){
+		
+		var say = "Hello World!";
+		console.log(say);
+		return say;
+		
+	}, ['./needed', './dependency']);
+
+This is the beautiful fix that works everywhere. You get your own closure which
+executes only after all your dependencies (and all of their sub-dependencies)
+have loaded - then whatever you return from your closure gets exported out!
+
+Say you name this file as 'world.js', all you have to do is run `node world.js`
+on the server or put `require('world')` on the client inside the 'theory.js'
+script tag (or have a normal' world.js' script tag below theory.js). All
+dependencies are relative to your file, not the HTML page or the parent module!
+
+If the dependency you require uses some global variable, you can access it from
+there (such as `jQuery`) as usual. You can access `theory` as a global, but you
+should not use it globally - theory copies itself into the scope of each module
+(the `a` argument, henceforth used for the rest of this documentation).
+
+All dependencies that use exports (normal Node modules and theory specific
+modules) get attached to your module's local scope with their base filename
+(`a.needed` and `a.dependency` in the example above). If you have conflicting
+names or just want a different name then use an object to declare dependencies
+instead of an array (`{'./needed': 'foo', './dependency': 'bar'}` become `a.foo`
+and `a.bar`). Theory modules also attach to their own namespace, such as
+`theory.hello` in above.
+
+*Now let's dive into the API.*
 
 Binary
 ======
@@ -57,7 +114,7 @@ Numbers
 
         -   `a.num("My values are 33, -2.2, and 6.").ify([])` → `[33, -2.2, 6]`
 
--   **random** `a.num.random(what)`, `a.num.r(what)`
+-   **random** `a.num.random(what)` or `a.num.r(what)`
 
     -   if what is a number, it represents how many digits long you want your
         random number.
@@ -104,7 +161,7 @@ Text
         -   `a.text.ify({a:0,b:'1',c:[0,'1'],d:{e:'f'}})` →
             `"{a:0,b:'1',c:[0,'1'],d:{e:'f'}}"`
 
--   **random** `a.text.random(what, length)`, `a.text.r(what, length)`
+-   **random** `a.text.random(what, length)` or `a.text.r(what, length)`
 
     -   what is a text of allowed characters to be used. Defaults to
         alpha-numeric characters.
@@ -415,7 +472,7 @@ Objects
 
         -   `a.obj([{a:1},{b:2}]).copy()` → `[{a:1},{b:2}]`
 
--   **union** `a.obj.union(what, ...)`, `a.obj(what).u(...)`
+-   **union** `a.obj.union(what, ...)` or `a.obj(what).u(...)`
 
     -   what is the object you want to merge into, or a list of objects to
         merge.
@@ -435,7 +492,7 @@ Objects
 
         -   `a.obj.u([{a:1,b:2},{b:3,x:4},{y:5}])` → `{a:1,b:2,x:4,y:5}`
 
--   **get** `a.obj.get(what, where)`
+-   **get** `a.obj.get(what, where)` or `a(what, where)`
 
     -   what is the object you want to get something from.
 
@@ -446,6 +503,9 @@ Objects
 
         -   "-\>" postfix indicates you will be calling a function, but if not
             found it will return a fail safe function.
+
+    -   *Note:* Warning, fails if the property name itself contains a '.' dot in
+        it.
 
     -   Examples
 
@@ -579,6 +639,36 @@ Functions
         -   `a.fns.flow([function(next){ next.end(2) },function(){ /* skipped */
             }],function(two){ alert(two) })`
 
+Events
+======
+
+-   **event** `a.on(what).event(function)`
+
+    -   what is a string name of the event you want to listen on.
+
+    -   function is the callback function that will be called when the event is
+        emitted.
+
+        -   the `this` object of the callback is the listener object.
+
+    -   returns the listener, which you can call `.off()` on to stop receiving
+        events.
+
+    -   Examples
+
+        -   `a.on('alarm').event(function(task){ alert('Remember to ' + task);
+            this.off(); })`
+
+-   **emit** `a.on(what).emit(data, ...)`
+
+    -   what is a string name of the event you want to emit on.
+
+    -   data and ... are your parameters to emit to the receivers.
+
+    -   Examples
+
+        -   `a.on('alarm').emit('exercise!')`
+
 Time
 ====
 
@@ -595,11 +685,11 @@ Time
 
 -   **now** `a.time.now()`
 
-    -   hyper precise timestamp, four digits longer than the above.
+    -   hyper precise timestamp, up to four decimals longer than the above.
 
     -   Examples
 
-        -   `a.time.now()` → `13574578667742920`
+        -   `a.time.now()` → `1357457866774.292`
 
 -   **loop** `a.time.loop(function, interval)`
 
@@ -634,4 +724,41 @@ Time
 
         -   `a.time.stop(1111)` → `true`
 
-[[ ... to be continued ]]
+Tests
+=====
+
+-   **is** `a.test.is(what, thing)`
+
+    -   what is what you want to compare equivalency against thing.
+
+    -   thing is the thing you want to compare equivalency to what.
+
+    -   Examples
+
+        -   `a.test.is({a:1,b:'c',d:{f:function(){return
+            false}}},{a:1,b:'c',d:{f:function(){return false}}})` → `true`
+
+        -   `a.test(NaN).is(NaN)` → `true`
+
+        -   `a.test.is(function(){return true},function(){ return true; })` →
+            `false`
+
+        -   `a.test(undefined).is(null)` → `false`
+
+-   **test** `a.test(function)()`
+
+    -   function is the function that might break, and you want to test.
+
+    -   *Note:* all this does is wrap it in a `try{}catch(){}` block.
+
+    -   Examples
+
+        -   `a.test(function(){ explode_with_spam })()` → `// error object`
+
+        -   `a.test(function(){ return 'ok'; })()` → `'ok'`
+
+Run them! Using mocha, just `mocha` with node or `./test/mocha.html` in any
+browser.  
+  
+Crafted with love by Mark Nadal, whom is not responsible for any liabilities
+from the use of this code.
