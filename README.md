@@ -19,7 +19,7 @@ Motivation
 3.  **Universal normalization**. Write once, run everywhere. This dream gets
     broken when you discover different implementations of JavaScript behave in
     unique ways, whether browsers or phones and tablets, or IE6 versus server
-    side. I needed reliable yet tiny library (**7KB** gzipped) that would
+    side. I needed reliable yet tiny library (at **7KB** gzipped) that would
     normalize everything so any code written would literally work everywhere.
 
 Require
@@ -45,7 +45,7 @@ have loaded - then whatever you return from your closure gets exported out!
 
 Say you name this file as 'world.js', all you have to do is run `node world.js`
 on the server or put `require('world')` on the client inside the 'theory.js'
-script tag (or have a normal' world.js' script tag below theory.js). All
+script tag (or have a normal 'world.js' script tag below theory.js). All
 dependencies are relative to your file, not the HTML page or the parent module!
 
 If the dependency you require uses some global variable, you can access it from
@@ -60,6 +60,9 @@ names or just want a different name then use an object to declare dependencies
 instead of an array (`{'./needed': 'foo', './dependency': 'bar'}` become `a.foo`
 and `a.bar`). Theory modules also attach to their own namespace, such as
 `theory.hello` in above.
+
+Finally, you can also specify sub dependencies, in the case where you need
+`{'./jquery':['./jquery-ui','./jquery-ext']}` to align external files.
 
 *Now let's dive into the API.*
 
@@ -757,7 +760,7 @@ Tests
 
         -   `a.test(function(){ return 'ok'; })()` → `'ok'`
 
-Run them! Using mocha, just `mocha` with node or `./test/mocha.html` in any
+Run them! Using mocha, just `mocha` with Node or `./test/mocha.html` in any
 browser.  
   
 Crafted with love by Mark Nadal, whom is not responsible for any liabilities
