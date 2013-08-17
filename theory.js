@@ -747,7 +747,7 @@ theory=(function(b,c,fn){
 				} var fn, c = 0, cb = function(f){ fn = f; };
 				theory.list((p = theory.list.is(p)? p : [p])).each(function(v){
 					window.module.ajax.code(v,function(d){++c && (p.length <= c) && fn && fn(d)});
-				}); return cb;
+				}); require.ing=true; return cb;
 			}; require.resolve = util.resolve; require.cache = {};
 			util.init();
 			root.who = root.who||a.list((document.cookie+';').match(/tid=(.+?);/)||[]).at(-1)||'';
@@ -800,7 +800,7 @@ theory=(function(b,c,fn){
 		}}; args.on = theory.on('ThEoRy_DePs').event(args.cb);
 		(root.deps.now = root.deps.now||[]).push(mod.name);
 		args.start = function(){util.deps(mod.dependencies,args); return args.cb()}
-		args.name = function(src ,b){
+		args.name = function(src){
 			module.on = args.name = false;
 			root.deps.now = theory.list(root.deps.now).less(mod.name);
 			root.deps.alias[args.src = mod.src = src] = mod.name;
@@ -809,7 +809,7 @@ theory=(function(b,c,fn){
 			} if(!window.JSON){module.ajax.load(root.opts.JSON||location.local // JSON shim when needed
 				+"//ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js",args.start)
 			} else { return args.start() };
-		}; module.on = (module.on === undefined)? args.name(util.src(1))||false : args.name;
+		}; module.on = (module.on === undefined && !require.ing)? args.name(util.src(1))||false : args.name;
 	});
 	util.deps = (function(deps, opt){
 		opt = opt || {};
@@ -897,7 +897,8 @@ theory=(function(b,c,fn){
 	util.theorycount = 0;
 	util.src = (function(){
 		var s = document.getElementsByTagName('script');
-		return (s[s.length-1]||{}).src;
+		s = (s[s.length-1]||{}).src;
+		return util.stripify(s) === theory.name? location : s||location;
 	});
 	util.init = (function(r){
 		if(!root.page){ return }
