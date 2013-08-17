@@ -20,9 +20,7 @@ module.exports=require('theory')
 		it('equality',function(){
 			(function(){
 				expect(theory.test(function(){ return 1; })()).to.be(1);
-				var e = theory.test(function(){ explode })().toString();
-				e = (e === "ReferenceError: explode is not defined" || e === "[object Error]");
-				expect(e).to.be.ok();
+				expect(theory.test(function(){ explode; return 1; })()).to.not.be(1);
 			})();
 			expect(theory.test(function(){ return 'testing'; }).is(function(){ return 'testing'; })).to.be.ok();
 			expect(theory.test(NaN).is(NaN)).to.be.ok();
