@@ -62,7 +62,9 @@ and `a.bar`). Theory modules also attach to their own namespace, such as
 `theory.hello` in above.
 
 You can also specify sub dependencies, such as `{'./jquery':['./jquery-ui',
-'./jquery-ext']}`.
+'./jquery-ext']}`. Define environment specific dependencies by checking for
+`root.page` or `root.node`. Finally, [imports.js](https://gist.github.com/amark/6291429) 
+is an unmaintained version of just the require feature, without anything below.
 
 *Now let's dive into the API.*
 

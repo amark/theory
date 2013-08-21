@@ -2,7 +2,7 @@ module.exports=require('theory')
 ('object_union',function(a){
 	describe('objects',function(){
 		beforeEach(function(done){ // IE6 stack release
-			setTimeout(done, 0);
+			setTimeout(function(){done()}, 0);
 		});
 		it('union',function(){
 			expect(theory.obj({a:'b',c:'d'}).union({c:1,z:2})).to.eql({a:'b',c:'d',z:2});

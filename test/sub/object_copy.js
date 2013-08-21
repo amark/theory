@@ -1,7 +1,7 @@
 describe('objects',function(){
 	var t = {};
 	beforeEach(function(done){ // IE6 stack release
-		setTimeout(done, 0);
+		setTimeout(function(){done()}, 0);
 	});
 	it('copy',function(){
 		t.val = {a:1,b:'c',d:[0,1,2],e:{f:'g'},h:function(){ return 1 }};

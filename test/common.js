@@ -1,6 +1,8 @@
+var TS = new Date().getTime();
 module.exports=require('theory')
 ('tests',function(a){
 	var s='',i;for(i in a){s+=i+', '};console.log(s);
+	root.page && (document.getElementById('debug').innerHTML = (new Date().getTime() - TS)/1000+'s '+module.sync);
 	describe('Dependencies',function(){
 		it('are',function(){
 			expect(a.binary).to.be(true);
@@ -63,7 +65,11 @@ module.exports=require('theory')
 		mocha.run();
 	}
 },{
-	'./sub/sub':''
+	'./dep':[
+		'./a'
+		,'./b'
+	]
+	,'./sub':''
 	,'./binary':''
 	,'./numbers':'count'
 	,'./strings':'texts'

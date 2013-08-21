@@ -692,7 +692,7 @@ theory=(function(b,c,fn){
 (function(r){
 	var root = root||{}, a = theory;
 	root.opts = root.opts || {};
-	root.deps = {loaded:{},alias:{},all:{},now:[]};
+	root.deps = {loaded:{},alias:{},all:{},wait:{}};
 	root.pollute = ((typeof GLOBAL !== 'undefined' && GLOBAL.global && GLOBAL.process &&
 					GLOBAL.process.env && GLOBAL.process.pid && GLOBAL.process.execPath)?
 		(function(){
@@ -725,16 +725,16 @@ theory=(function(b,c,fn){
 			location.local=(location.protocol==='file:'?'http:':'');
 			window.__dirname = '';
 			window.module = {exports: (window.exports = {})};
-			window.module.ajax = {load:(function(b,c){ // modified cross browser async javascript loader via http://johannburkard.tumblr.com/post/3053844418
-				var d=document,j="script",s=d.createElement(j),e=2166136261
-				,g=b.length,h=c,i=/=\?/,w=window.setTimeout,x,y,a=function(z){
-					document.body&&(z=z||x)&&s?document.body[y=z](s):w(a,0);
+			window.module.ajax = {load:(function(b,c){
+				var d=document,j="script",s=d.createElement(j); module.sync=(s.onload===null||!s.readyState)?0:1; // IE6+
+				var e=2166136261,g=b.length,h=c,i=/=\?/,w=window.setTimeout,x,y,a=function(z){
+					document.body&&(z=z||x)&&s&&document.body[z]?document.body[y=z](s):w(a,0);
 				};if(i.test(b)){for(;g--;)e=e*16777619^b.charCodeAt(g);
 					window[j+=e<0?-e:e]=function(){h.apply(h,arguments);delete window[j]};b=b.replace(i,"="+j);c=0
 				};s.onload=s.onreadystatechange=function(){if(y&&/de|m/.test(s.readyState||"m")){
 					c&&c();a(x='removeChild');try{for(c in s)delete s[c]}catch(b){}
-				}};s.src=b;a(x='appendChild');
-			})};
+				}};s.src=b;c&&a(x='appendChild');
+			})};module.ajax.load('#');
 			window.module.ajax.code = util.load;
 			window.onerror = (function(e,w,l){
 				console.log(e + " at line "+ l +" on "+ w);
@@ -747,7 +747,7 @@ theory=(function(b,c,fn){
 				} var fn, c = 0, cb = function(f){ fn = f; };
 				theory.list((p = theory.list.is(p)? p : [p])).each(function(v){
 					window.module.ajax.code(v,function(d){++c && (p.length <= c) && fn && fn(d)});
-				}); require.ing=true; return cb;
+				}); return cb;
 			}; require.resolve = util.resolve; require.cache = {};
 			util.init();
 			root.who = root.who||a.list((document.cookie+';').match(/tid=(.+?);/)||[]).at(-1)||'';
@@ -783,10 +783,7 @@ theory=(function(b,c,fn){
 		args = {cb:function(p, opt){
 			if(args.launched 
 			|| a.list(util.deps(mod.dependencies,{flat:{}})).each(function(v,j){
-				if(!(i = root.deps.loaded[j])){ 
-					module.sync && !module.on && a.time.wait(function(){util.load(j)},1);
-					return true 
-				}
+				if(!(i = root.deps.loaded[j])){ return true }
 				if(i === 2){ return true }
 				if(i && i.launch && a.text.is(v) && mod.theory[v] === undefined){ mod.theory[v] = i.launch; }
 			})){ return }
@@ -798,18 +795,16 @@ theory=(function(b,c,fn){
 				theory.on('ThEoRy_DePs').emit();
 			} return args.launched.launch;	
 		}}; args.on = theory.on('ThEoRy_DePs').event(args.cb);
-		(root.deps.now = root.deps.now||[]).push(mod.name);
 		args.start = function(){util.deps(mod.dependencies,args); return args.cb()}
 		args.name = function(src){
 			module.on = args.name = false;
-			root.deps.now = theory.list(root.deps.now).less(mod.name);
 			root.deps.alias[args.src = mod.src = src] = mod.name;
 			if((root.deps.all[src] = mod.dependencies)){
 				root.deps.loaded[src] = 2;
 			} if(!window.JSON){module.ajax.load(root.opts.JSON||location.local // JSON shim when needed
 				+"//ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js",args.start)
 			} else { return args.start() };
-		}; module.on = (module.on === undefined && !require.ing)? args.name(util.src(1))||false : args.name;
+		}; module.on = (!require.ing)? args.name(util.src(1))||false : args.name;
 	});
 	util.deps = (function(deps, opt){
 		opt = opt || {};
@@ -861,13 +856,14 @@ theory=(function(b,c,fn){
 			else if('.' != seg){ path.push(seg) }
 		} return path.join('/');
 	});
-	util.load = (function(p, opt){
+	util.load = (function(p, opt ,z){
 		if(util.stripify(p) == util.stripify(theory.name)){
 			return util.require;
 		} opt = opt || {};
-		if(root.deps.now.length){
-			module.sync = 1; return;
-		} var path = util.pathify(p), url = util.urlify(path)
+		{var w=root.deps.wait;if(module.sync){if(!z && !a.obj.empty(w)){
+			w[p] = opt;if(opt.defer){w=root.deps.wait = a.obj(w).u(opt.defer)}return;
+		}w[p] = opt;if(opt.defer){w=root.deps.wait = a.obj(w).u(opt.defer)}}}
+		var path = util.pathify(p), url = util.urlify(path)
 		, cb = (function(d){
 			if(false !== d){
 				console.log(opt.p||p, ' loaded');
@@ -875,11 +871,14 @@ theory=(function(b,c,fn){
 				module.on && module.on(url);
 				theory.fns.is(opt) && opt(d);
 			} theory.on('ThEoRy_DePs').emit();
-			!module.sync && (opt.def||opt.defer) && util.deps(opt.defer, opt);
+			!module.sync && opt.defer && util.deps(opt.defer, opt);
+			{if(module.sync){delete w[p];if(!a.obj(w).each(function(v,i,t){
+			delete w[i];util.load(i,v,1);return 1;})){w=root.deps.wait = false}}}
 		}); if(root.deps.loaded[url] 
 		|| root.deps.loaded[url] === 0){
 			return cb(false); 
 		} root.deps.loaded[url] = 0;
+		require.ing=true;
 		try{window.module.ajax.load(path,cb);}
 		catch(e){console.log("Network error.")};
 		console.log('loading', opt.p||p);

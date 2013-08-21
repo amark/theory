@@ -1,6 +1,6 @@
 describe('objects',function(){
 	beforeEach(function(done){ // IE6 stack release
-		setTimeout(done, 0);
+		setTimeout(function(){done()}, 0);
 	});
 	it('ify',function(){
 		expect(theory.obj('[0,1]').ify()).to.eql([0,1]);

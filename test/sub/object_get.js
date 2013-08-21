@@ -2,7 +2,7 @@ module.exports=require('theory')
 ('hash',function(a){
 	describe('objects',function(){
 		beforeEach(function(done){ // IE6 stack release
-			setTimeout(done, 0);
+			setTimeout(function(){done()}, 0);
 		});
 		it('get',function(){
 			expect(theory.obj({a:1,b:2,c:3}).get('b')).to.be(2);

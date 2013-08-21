@@ -1,7 +1,7 @@
 //alert('array is');
 describe('Lists',function(){
 	beforeEach(function(done){ // IE6 stack release
-		setTimeout(done, 0);
+		setTimeout(function(){done()}, 0);
 	});
 	it('is()',function(){
 		expect(theory.list([]).is()).to.be(true);
