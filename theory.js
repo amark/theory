@@ -294,7 +294,7 @@ theory=(function(b,c,fn){
 					}
 					if(n || a.obj(o||{}).has(v)){
 						o = n? a.list(o).at(v) : o[v];
-						if(i === x){
+						if(i === x - (a.list.index? 0 : 1)){
 							return f? a.fns.is(o)? o : f : o;
 						} return;
 					}
@@ -697,12 +697,14 @@ theory=(function(b,c,fn){
 					GLOBAL.process.env && GLOBAL.process.pid && GLOBAL.process.execPath)?
 		(function(){
 			global.node = root.node = true;
+			global.opts = root.opts;
 			global.theory = theory;
 			module.theory = module.theory||{}
 			process.env.totheory = __filename;
 			if(process.env.NODE_ENV==='production'){process.env.LIVE = true};
 			module.path = require('path');
 			module.exports=(function(cb,deps,name){
+				if(!arguments.length) return theory;
 				var args = a.fns.sort(a.list.slit.call(arguments, 0)), r
 					,m = util.require.apply({},arguments);
 				args.file = root.submodule||(module.parent||{}).filename;
@@ -718,11 +720,13 @@ theory=(function(b,c,fn){
 			});
 			return;
 		}) : (function(){
+			root.who = root.who||a.list((document.cookie+';').match(/tid=(.+?);/)||[]).at(-1)||'';
 			root.page = true;
 			window.root = root;
 			window.console = window.console||{log:function(s){return s}};
 			console.saw = (function(s){console.log(a.text(s).ify())});
 			location.local=(location.protocol==='file:'?'http:':'');
+			var noConflict={__dirname: window.__dirname,module:window.module,exports:window.exports,require:window.require};
 			window.__dirname = '';
 			window.module = {exports: (window.exports = {})};
 			window.module.ajax = {load:(function(b,c){
@@ -750,7 +754,7 @@ theory=(function(b,c,fn){
 				}); return cb;
 			}; require.resolve = util.resolve; require.cache = {};
 			util.init();
-			root.who = root.who||a.list((document.cookie+';').match(/tid=(.+?);/)||[]).at(-1)||'';
+			if(root.opts.amd === false){theory.obj(noConflict).each(function(v,i){window[i]=v});}
 			if(theory.com){ theory.com(theory.name).init() }
 		})
 	);
@@ -804,7 +808,7 @@ theory=(function(b,c,fn){
 			} if(!window.JSON){module.ajax.load(root.opts.JSON||location.local // JSON shim when needed
 				+"//ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js",args.start)
 			} else { return args.start() };
-		}; module.on = (!require.ing)? args.name(util.src(1))||false : args.name;
+		}; module.on = (!(require||{}).ing)? args.name(util.src(1))||false : args.name;
 	});
 	util.deps = (function(deps, opt){
 		opt = opt || {};
@@ -878,7 +882,7 @@ theory=(function(b,c,fn){
 		|| root.deps.loaded[url] === 0){
 			return cb(false); 
 		} root.deps.loaded[url] = 0;
-		require.ing=true;
+		(require||{}).ing=true;
 		try{window.module.ajax.load(path,cb);}
 		catch(e){console.log("Network error.")};
 		console.log('loading', opt.p||p);

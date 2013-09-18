@@ -415,6 +415,8 @@ it offers the following advantages:
     philosophically more meaningful than `if( items.indexOf('z') < 0 ) return;`
     with offset notation despite ignoring the asymmetry of the equation.
 
+Still irrational? Then switch it back via `a.list.index = 0` in your closure.
+
 Objects
 =======
 
