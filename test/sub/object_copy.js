@@ -4,6 +4,10 @@ describe('objects',function(){
 		setTimeout(function(){done()}, 0);
 	});
 	it('copy',function(){
+		expect(theory.obj([]).copy()).to.eql([]);
+		expect(theory.obj.copy([])).to.eql([]);
+		expect(theory.obj({}).copy()).to.eql({});
+		expect(theory.obj.copy({})).to.eql({});
 		t.val = {a:1,b:'c',d:[0,1,2],e:{f:'g'},h:function(){ return 1 }};
 		t.dup = theory.obj(t.val).copy();
 		expect(t.dup.a).to.be(t.val.a);

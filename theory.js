@@ -210,7 +210,7 @@ theory=(function(b,c,fn){
 				if(r && !a.obj.is(o) && !l){ return o } 
 				r = {}; o = a.obj.each(o,function(v,i,t){
 					l? t(obj.copy(v,true)) : (r[i] = obj.copy(v,true));
-				});
+				})||[];
 				return l? o : r;
 			});
 			obj.union = obj.u = (function(x,y){
