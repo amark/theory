@@ -6,10 +6,8 @@
 		<script>mocha.setup('bdd');</script>
 		<script src="./expect.js"></script>
 		<script src="http://requirejs.org/docs/release/2.1.8/minified/require.js"></script>
-		<script src="../theory.js">
-			root.opts.amd = false;
-			theory.com.off = true;
-		</script>
+		<script>root={opts:{com:false,amd:false}}</script>
+		<script src="../theory.js"></script>
 		<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 		<script src="http://underscorejs.org/underscore-min.js"></script>
 		<script src="http://backbonejs.org/backbone-min.js"></script>

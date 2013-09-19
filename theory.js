@@ -510,7 +510,7 @@ theory=(function(b,c,fn){
 						theory.com.close&&theory.com.close(m);
 					};
 				});
-				if(theory.com.off){ return }
+				if(theory.com.off || root.opts.com === false){ return }
 				if(window.SockJS){
 					municate();
 				} else {
@@ -680,7 +680,7 @@ theory=(function(b,c,fn){
 		})();
 		return a;
 	}
-	theory.name = 'theory';
+	theory.Name = 'theory';
 	theory.version = 2.4;
 	theorize(theory);
 	return theory;
@@ -715,14 +715,14 @@ theory=(function(b,c,fn){
 				});
 				module.theory[m.name] = a.obj.ify(a.text.ify(m));
 				var mod = (theory[m.name] = m.init(m.theory));
-				if(global.aname === m.name && theory.com) theory.com(theory.name).init(m.name);
+				if(global.aname === m.name && theory.com) theory.com(theory.Name).init(m.name);
 				return mod;
 			});
 			return;
 		}) : (function(){
-			root.who = root.who||a.list((document.cookie+';').match(/tid=(.+?);/)||[]).at(-1)||'';
+			root = window.root = window.root||root;
 			root.page = true;
-			window.root = root;
+			root.who = root.who||a.list((document.cookie+';').match(/tid=(.+?);/)||[]).at(-1)||'';
 			window.console = window.console||{log:function(s){return s}};
 			console.saw = (function(s){console.log(a.text(s).ify())});
 			location.local=(location.protocol==='file:'?'http:':'');
@@ -746,7 +746,7 @@ theory=(function(b,c,fn){
 			});
 			window.require = module.require = function require(p){
 				if(!p){ return require }
-				if(util.stripify(p) == util.stripify(theory.name)){
+				if(util.stripify(p) == util.stripify(theory.Name)){
 					return util.require;
 				} var fn, c = 0, cb = function(f){ fn = f; };
 				theory.list((p = theory.list.is(p)? p : [p])).each(function(v){
@@ -755,7 +755,7 @@ theory=(function(b,c,fn){
 			}; require.resolve = util.resolve; require.cache = {};
 			util.init();
 			if(root.opts.amd === false){theory.obj(noConflict).each(function(v,i){window[i]=v});}
-			if(theory.com){ theory.com(theory.name).init() }
+			if(theory.com){ theory.com(theory.Name).init() }
 		})
 	);
 	var util = {};	
@@ -861,7 +861,7 @@ theory=(function(b,c,fn){
 		} return path.join('/');
 	});
 	util.load = (function(p, opt ,z){
-		if(util.stripify(p) == util.stripify(theory.name)){
+		if(util.stripify(p) == util.stripify(theory.Name)){
 			return util.require;
 		} opt = opt || {};
 		{var w=root.deps.wait;if(module.sync){if(!z && !a.obj.empty(w)){
@@ -901,7 +901,7 @@ theory=(function(b,c,fn){
 	util.src = (function(){
 		var s = document.getElementsByTagName('script');
 		s = (s[s.length-1]||{}).src;
-		return util.stripify(s) === theory.name? location : s||location;
+		return util.stripify(s) === theory.Name? location : s||location;
 	});
 	util.init = (function(r){
 		if(!root.page){ return }
@@ -909,7 +909,7 @@ theory=(function(b,c,fn){
 		for(var i in s){var v = s[i]; // IE6 fails on each, use for instead
 			r = v.src||r;
 			if(v.id || !v.innerHTML || util.stripify(v.src) 
-			!== util.stripify(theory.name)){ false;
+			!== util.stripify(theory.Name)){ false;
 			} else { t = v }
 		} if(t){
 			util.sandbox(t.innerHTML,'Theory Configuration');
