@@ -475,6 +475,7 @@ theory=(function(b,c,fn){
 			theory.com.queue = theory.com.queue||[];
 			com.dc = [theory.time.now()];
 			com.node = (function(opt){
+				if(!process._events){ process._events = {} }
 				if(process.send && !process._events.theory){
 					process._events.theory = (function(m){
 						com.msg(a.obj.ify(m));
