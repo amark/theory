@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../../theory')
 ('object_union',function(a){
 	describe('objects',function(){
 		beforeEach(function(done){ // IE6 stack release

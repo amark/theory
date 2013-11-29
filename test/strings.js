@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../theory')
 ('language',function(a){
 	var t = {};
 	describe('Text',function(){

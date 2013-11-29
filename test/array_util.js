@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../theory')
 ('list_utils',function(a){
 	//alert('arrays util');
 	describe('arrays',function(){

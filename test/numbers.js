@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../theory')
 ('numbers',function(a){
 	describe('Numbers',function(){
 		it('is()',function(){

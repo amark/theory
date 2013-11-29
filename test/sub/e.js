@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../../theory')
 ('fan',function(a){
 	return 'g';
 });

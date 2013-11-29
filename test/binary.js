@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../theory')
 ('binary',function(a){
 	describe('Binary',function(){
 		it('is()',function(){

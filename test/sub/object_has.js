@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../../theory')
 ('object_has',function(a){
 	describe('objects',function(){
 		it('has',function(){

@@ -704,6 +704,7 @@ theory=(function(b,c,fn){
 			process.env.totheory = __filename;
 			if(process.env.NODE_ENV==='production'){process.env.LIVE = true};
 			module.path = require('path');
+			require.sep = module.path.sep;
 			module.exports=(function(cb,deps,name){
 				if(!arguments.length) return theory;
 				var args = a.fns.sort(a.list.slit.call(arguments, 0)), r
@@ -711,7 +712,7 @@ theory=(function(b,c,fn){
 				args.file = root.submodule||(module.parent||{}).filename;
 				global.aname = global.aname||m.name;
 				a.obj(util.deps(m.dependencies,{flat:{},src:args.file})).each(function(name,path){
-					var p = require(root.submodule=path);
+					var p = require(root.submodule=path=util.resolve(path,path));
 					m.theory[name] = (theory.obj.is(p) && theory.obj.empty(p))? undefined : p;
 				});
 				module.theory[m.name] = a.obj.ify(a.text.ify(m));
@@ -753,7 +754,7 @@ theory=(function(b,c,fn){
 				theory.list((p = theory.list.is(p)? p : [p])).each(function(v){
 					window.module.ajax.code(v,function(d){++c && (p.length <= c) && fn && fn(d)});
 				}); return cb;
-			}; require.resolve = util.resolve; require.cache = {};
+			}; window.require.sep = '/'; require.resolve = util.resolve; require.cache = {};
 			util.init();
 			if(root.opts.amd === false){theory.obj(noConflict).each(function(v,i){window[i]=v});}
 			if(theory.com){ theory.com(theory.Name).init() }
@@ -849,17 +850,18 @@ theory=(function(b,c,fn){
 	});
 	util.stripify = (function(p){
 		if(!a.text.is(p)){ return ''; } p=p.replace(/^\./,'');
-		return (p.split('/').reverse()[0]).replace(/\.js$/i,'');
+		return (p.split(require.sep).reverse()[0]).replace(/\.js$/i,'');
 	});
 	util.resolve = (function(p1, p2){ // via browserify
-		if('.' != p2.charAt(0)){ return p2 }
-		var path = p1.split('/'), segs = p2.split('/');
+		if('.' != p2.charAt(0)){ return p2.replace('/',require.sep) }
+		var path = p1.replace('/',require.sep).split(require.sep)
+		, segs = p2.replace('/',require.sep).split(require.sep)
 		path.pop();
 		for(var i=0;i<segs.length;i++){
 			var seg = segs[i];
 			if('..' == seg){ path.pop() }
 			else if('.' != seg){ path.push(seg) }
-		} return path.join('/');
+		} return path.join(require.sep);
 	});
 	util.load = (function(p, opt ,z){
 		if(util.stripify(p) == util.stripify(theory.Name)){

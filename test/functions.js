@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../theory')
 ('functions',function(a){
 	function Func(){
 		return Func;

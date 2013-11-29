@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../theory')
 ('syllabus',function(a){
 	describe('arrays',function(){
 		it('deps',function(){

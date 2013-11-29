@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../theory')
 ('hash',function(a){
 	//var s='',i;for(i in a){s+=i+', '};alert('hash: '+s);
 	describe('Objects',function(){

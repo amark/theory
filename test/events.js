@@ -1,4 +1,4 @@
-module.exports=require('theory')
+module.exports=require('../theory')
 ({name: 'events'
 , init: function(a){
 	var t = {};
