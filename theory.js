@@ -561,7 +561,7 @@ theory=(function(b,c,fn){
 			});theory.com.asked = theory.com.asked||{};
 			com.reply = (function(m){
 				m = com.ways(m);
-				if(m.how.web === 'state'){
+				if(m.how.web){
 					m.how.way = 'web.reply';
 				} m.who = m.who||{};
 				m.who.to = m.who.to||m.who.tid;
