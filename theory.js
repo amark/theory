@@ -451,7 +451,8 @@ theory=(function(b,c,fn){
 				return t? t instanceof Date : (+new Date().getTime());
 			});
 			time.now = (function(){
-				return a.num.ify((a.time.is().toString())+'.'+a.num.r(4));
+				var n = a.num.ify((a.time.is().toString())+'.'+a.num.r(4));
+				return (theory.time.now.last||0) < n? (theory.time.now.last = n) : time.now();
 			});
 			time.loop = (function(fn,d){
 				var args = a.fns.sort(a.list.slit.call(arguments, 0));
@@ -682,7 +683,7 @@ theory=(function(b,c,fn){
 		return a;
 	}
 	theory.Name = 'theory';
-	theory.version = 2.4;
+	theory.version = 2.5;
 	theorize(theory);
 	return theory;
 })(true);
