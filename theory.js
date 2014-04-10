@@ -472,7 +472,7 @@ theory=(function(b,c,fn){
 			var com = a.com;
 			com.$ = $ !== undefined? $ : _;
 			com.way = com.way||$;$=_;
-			com.queue = [];
+			com.queue = a.list([]).fuse(theory.com.queue||[]);
 			theory.com.queue = theory.com.queue||[];
 			com.dc = [theory.time.now()];
 			com.node = (function(opt){
@@ -483,6 +483,7 @@ theory=(function(b,c,fn){
 					}); process.on('message',process._events.theory);
 					process.send({onOpen:{readyState:(process.readyState = 1)},mod:module.theory[opt.way]});
 					com.wire = process;
+					com.drain();
 					return;
 				}
 			});
@@ -534,7 +535,7 @@ theory=(function(b,c,fn){
 				if(a.obj.is(m)){
 					m = a.text(m).ify();
 				}
-				//console.log("send --> "+m);
+				//console.log("theory: send --> ", m);
 				c.send(m);
 			});
 			com.init = (function(c){
@@ -683,7 +684,7 @@ theory=(function(b,c,fn){
 		return a;
 	}
 	theory.Name = 'theory';
-	theory.version = 2.6;
+	theory.version = 2.7;
 	theorize(theory);
 	return theory;
 })(true);
