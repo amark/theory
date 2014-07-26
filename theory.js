@@ -213,7 +213,7 @@ theory=(function(b,c,fn){
 				})||[];
 				return l? o : r;
 			});
-			obj.union = obj.u = (function(x,y){
+			obj.union = obj.u = (function(x,y){ // TODO: if both objects have the same property that is an object, these don't get merged.
 				var args = a.list.slit.call(arguments, 0), r = {};
 				if($=a.fns.$(obj)){ y=x;x=$ }
 				if(a.list.is(x)){ y = x } else
@@ -322,7 +322,7 @@ theory=(function(b,c,fn){
 			text.random = text.r = (function(l,c){
 				if($=a.fns.$(text)){ c=l;l=$ } var $ = $||l, s = '';
 				l = a.num.is($)? $ : a.num.is(c)? c : 16;
-				c = a.text.is($)? $ : a.text.is(c)? c : '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
+				c = a.text.is($)? $ : a.text.is(c)? c : '0123456789ABCDEFGHIJKLMNOPQRSTUVWXZabcdefghiklmnopqrstuvwxyz';
 				while(l>0){ s += c.charAt(Math.floor(Math.random()*c.length)); l-- }
 				return s;
 			});
@@ -539,6 +539,7 @@ theory=(function(b,c,fn){
 				c.send(m);
 			});
 			com.init = (function(c){
+				//console.log("Starting Theory Communication", c);
 				if(root.node){ com.node({way:c}) }
 				if(c){ return }
 				if(root.page){ com.page() }
@@ -546,7 +547,14 @@ theory=(function(b,c,fn){
 			});
 			/** Helpers **/
 			com.msg = (function(m,c){
-				theory.obj.get(theory,theory.obj.get(m,'how.way')+'->')(m,c);
+				var fn = theory.obj.get(theory,theory.obj.get(m,'how.way'));
+				if(a.fns.is(fn)){ return fn(m) };
+				theory.on('ThEoRy_MsG').emit(m);
+			});
+			com.on = (function(cb){
+				return theory.on('ThEoRy_MsG').event(function(m){
+					if(a.fns.is(cb)){ cb(m) }
+				});
 			});
 			com.ways = (function(m,w){
 				var way = w||a.obj.get(m,'how.way')||com.way;
@@ -684,7 +692,7 @@ theory=(function(b,c,fn){
 		return a;
 	}
 	theory.Name = 'theory';
-	theory.version = 2.7;
+	theory.version = 2.8;
 	theorize(theory);
 	return theory;
 })(true);
@@ -707,17 +715,21 @@ theory=(function(b,c,fn){
 			if(process.env.NODE_ENV==='production'){process.env.LIVE = true};
 			module.path = require('path');
 			require.sep = module.path.sep;
+			module.paths = (module.parent||{}).paths || module.paths; // fixes relative npm installs while using theory via link, hopefully no side-effects.
 			module.exports=(function(cb,deps,name){
+				//console.log("arguments", cb, deps, name); 
 				if(!arguments.length) return theory;
 				var args = a.fns.sort(a.list.slit.call(arguments, 0)), r
 					,m = util.require.apply({},arguments);
-				args.file = root.submodule||(module.parent||{}).filename;
+				args.file = root.submodule||(module.parent||{}).filename; // TODO: BUG!!! On node -e we get coalesce recursively calling itself. :(
 				global.aname = global.aname||m.name;
 				a.obj(util.deps(m.dependencies,{flat:{},src:args.file})).each(function(name,path){
 					var p = require(root.submodule=path=util.resolve(path,path));
 					m.theory[name] = (theory.obj.is(p) && theory.obj.empty(p))? undefined : p;
 				});
 				module.theory[m.name] = a.obj.ify(a.text.ify(m));
+				//console.log("Let's start they day off with some lovely ugly", 'deps', deps, 'name', name, 'global aname', global.aname);
+				//console.log('sub.file', root.submodule, (module.parent||{}).filename);
 				var mod = (theory[m.name] = m.init(m.theory));
 				if(global.aname === m.name && theory.com) theory.com(theory.Name).init(m.name);
 				return mod;
